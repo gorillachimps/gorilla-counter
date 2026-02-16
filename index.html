@@ -3,21 +3,45 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gorilla Counter - Base</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Righteous&family=Inter:wght@400;600;700&display=swap');
+  <title>Gorilla Counter - Beat Your Chest on Base</title>
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+  <!-- Open Graph / Social Sharing -->
+  <meta property="og:title" content="Gorilla Counter - Beat Your Chest on Base">
+  <meta property="og:description" content="The onchain gorilla chest-beating competition. Beat your chest, climb the leaderboard, become the Alpha Gorilla.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://gorillachimps.github.io/gorilla-counter/">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Gorilla Counter - Beat Your Chest on Base">
+  <meta name="twitter:description" content="The onchain gorilla chest-beating competition on Base.">
+  <meta name="description" content="Beat your chest onchain. Compete to become the Alpha Gorilla on Base. Powered by ERC-8021.">
+
+  <!-- Favicon (gorilla emoji as SVG) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x1F98D;</text></svg>">
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Righteous&family=Inter:wght@400;500;600;700&display=swap');
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --green-primary: #4CAF50;
+      --green-light: #81C784;
+      --green-dark: #2E7D32;
+      --green-darker: #1B5E20;
+      --orange-primary: #FF6D00;
+      --orange-light: #FF9100;
+      --orange-dark: #E65100;
+      --bg-dark: #0a0f0a;
+      --bg-card: rgba(15, 30, 15, 0.85);
+      --text-primary: #e0e0e0;
+      --text-muted: #6a9a6a;
+    }
 
     body {
-      font-family: 'Inter', sans-serif;
-      background: #0a0f0a;
-      color: #e0e0e0;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-primary);
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 2rem 1rem;
       overflow-x: hidden;
       position: relative;
     }
@@ -28,14 +52,14 @@
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
       background:
-        radial-gradient(ellipse at 20% 80%, rgba(34, 139, 34, 0.15) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 20%, rgba(0, 100, 0, 0.1) 0%, transparent 50%),
-        radial-gradient(ellipse at 50% 50%, rgba(20, 60, 20, 0.2) 0%, transparent 70%),
+        radial-gradient(ellipse at 20% 80%, rgba(34, 139, 34, 0.12) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(0, 100, 0, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(20, 60, 20, 0.15) 0%, transparent 70%),
         linear-gradient(180deg, #0a0f0a 0%, #0d1a0d 50%, #0a0f0a 100%);
       z-index: -2;
     }
 
-    /* Animated fog/mist */
+    /* Animated fog */
     body::after {
       content: '';
       position: fixed;
@@ -52,6 +76,88 @@
       50% { transform: translateX(10%); }
     }
 
+    /* === HEADER / NAV === */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      width: 100%;
+      padding: 0.75rem 1.5rem;
+      background: rgba(10, 15, 10, 0.9);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(76, 175, 80, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      text-decoration: none;
+    }
+
+    .nav-brand .logo { font-size: 1.6rem; }
+
+    .nav-brand .brand-text {
+      font-family: 'Righteous', cursive;
+      font-size: 1.2rem;
+      background: linear-gradient(135deg, var(--green-primary), var(--green-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .nav-right { display: flex; align-items: center; gap: 0.75rem; }
+
+    .network-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 20px;
+      background: rgba(76, 175, 80, 0.1);
+      border: 1px solid rgba(76, 175, 80, 0.25);
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--green-light);
+    }
+
+    .network-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--green-primary);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .nav-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 500;
+      padding: 0.35rem 0.6rem;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+
+    .nav-link:hover { color: var(--green-light); background: rgba(76, 175, 80, 0.1); }
+
+    /* === MAIN CONTENT === */
+    .main-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1.5rem 1rem 2rem;
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
     /* Particle canvas */
     #particles {
       position: fixed;
@@ -61,24 +167,43 @@
       z-index: 100;
     }
 
-    /* Gorilla section */
+    /* Vine decorations */
+    .vine-left, .vine-right {
+      position: fixed; top: 0;
+      width: 50px; height: 100%;
+      pointer-events: none; z-index: -1;
+    }
+    .vine-left { left: 0; background: linear-gradient(to right, rgba(34, 100, 34, 0.08), transparent); }
+    .vine-right { right: 0; background: linear-gradient(to left, rgba(34, 100, 34, 0.08), transparent); }
+
+    /* Floating leaves */
+    .leaf {
+      position: fixed; font-size: 1.2rem; opacity: 0.12;
+      pointer-events: none; z-index: -1;
+      animation: leafFloat linear infinite;
+    }
+    @keyframes leafFloat {
+      0% { transform: translateY(-20px) rotate(0deg); opacity: 0; }
+      10% { opacity: 0.12; }
+      90% { opacity: 0.12; }
+      100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+    }
+
+    /* === GORILLA === */
     .gorilla-container {
       position: relative;
-      margin: 1rem 0 0.5rem;
+      margin: 0.5rem 0;
       cursor: default;
       user-select: none;
     }
 
     .gorilla {
-      font-size: 6rem;
+      font-size: 5.5rem;
       display: block;
-      transition: transform 0.1s;
-      filter: drop-shadow(0 0 30px rgba(34, 139, 34, 0.3));
+      filter: drop-shadow(0 0 25px rgba(34, 139, 34, 0.3));
     }
 
-    .gorilla.beating {
-      animation: chestBeat 0.6s ease-out;
-    }
+    .gorilla.beating { animation: chestBeat 0.6s ease-out; }
 
     @keyframes chestBeat {
       0% { transform: scale(1); }
@@ -86,87 +211,80 @@
       30% { transform: scale(0.9) rotate(5deg); }
       45% { transform: scale(1.2) rotate(-3deg); }
       60% { transform: scale(0.95); }
-      80% { transform: scale(1.05); }
       100% { transform: scale(1); }
     }
 
-    /* Impact rings */
     .impact-ring {
-      position: absolute;
-      top: 50%; left: 50%;
+      position: absolute; top: 50%; left: 50%;
       width: 20px; height: 20px;
       border: 3px solid rgba(76, 175, 80, 0.8);
       border-radius: 50%;
       transform: translate(-50%, -50%) scale(0);
       pointer-events: none;
     }
-
-    .impact-ring.active {
-      animation: impactExpand 0.8s ease-out forwards;
-    }
-
+    .impact-ring.active { animation: impactExpand 0.8s ease-out forwards; }
     @keyframes impactExpand {
       0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
       100% { transform: translate(-50%, -50%) scale(8); opacity: 0; }
     }
 
-    /* Screen shake */
     .shake { animation: screenShake 0.4s ease-out; }
-
     @keyframes screenShake {
       0%, 100% { transform: translate(0); }
-      10% { transform: translate(-8px, 4px); }
-      20% { transform: translate(6px, -6px); }
-      30% { transform: translate(-4px, 2px); }
-      40% { transform: translate(4px, -2px); }
-      50% { transform: translate(-2px, 4px); }
-      60% { transform: translate(2px, -2px); }
-      70% { transform: translate(-1px, 1px); }
+      10% { transform: translate(-6px, 3px); }
+      20% { transform: translate(5px, -5px); }
+      30% { transform: translate(-3px, 2px); }
+      50% { transform: translate(2px, -2px); }
     }
 
+    /* === TYPOGRAPHY === */
     h1 {
       font-family: 'Righteous', cursive;
-      font-size: 2.8rem;
-      margin-bottom: 0.3rem;
-      background: linear-gradient(135deg, #4CAF50, #81C784, #A5D6A7);
+      font-size: 2.5rem;
+      margin-bottom: 0.2rem;
+      background: linear-gradient(135deg, var(--green-primary), var(--green-light), #A5D6A7);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      text-shadow: none;
     }
 
-    .subtitle {
-      color: #6a9a6a;
-      font-size: 1rem;
+    .subtitle { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.25rem; }
+
+    h2 {
+      font-family: 'Righteous', cursive;
+      font-size: 1.3rem;
+      color: var(--green-light);
       margin-bottom: 1rem;
+      text-align: center;
     }
 
+    /* === CARDS === */
     .card {
-      background: rgba(15, 30, 15, 0.8);
+      background: var(--bg-card);
       backdrop-filter: blur(10px);
       border-radius: 16px;
       padding: 1.5rem;
-      margin: 0.75rem 0;
+      margin: 0.6rem 0;
       width: 100%;
-      max-width: 480px;
-      border: 1px solid rgba(76, 175, 80, 0.2);
-      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(76, 175, 80, 0.15);
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
     }
 
+    /* === BUTTONS === */
     button {
-      background: linear-gradient(135deg, #2E7D32, #4CAF50);
+      background: linear-gradient(135deg, var(--green-dark), var(--green-primary));
       color: white;
       border: none;
-      padding: 1rem 2rem;
+      padding: 0.85rem 1.5rem;
       border-radius: 12px;
-      font-size: 1.1rem;
+      font-size: 1rem;
       font-weight: 700;
       cursor: pointer;
       width: 100%;
-      margin: 0.4rem 0;
+      margin: 0.3rem 0;
       transition: all 0.3s;
       text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: 0.5px;
       position: relative;
       overflow: hidden;
     }
@@ -176,159 +294,210 @@
       position: absolute;
       top: 0; left: -100%;
       width: 100%; height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
       transition: left 0.5s;
     }
-
     button:hover::after { left: 100%; }
-    button:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(76, 175, 80, 0.3); }
+    button:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(76, 175, 80, 0.25); }
     button:active { transform: translateY(0); }
-    button:disabled { background: #333; cursor: not-allowed; transform: none; box-shadow: none; }
+    button:disabled { background: #2a2a2a; cursor: not-allowed; transform: none; box-shadow: none; }
+    button:disabled::after { display: none; }
 
-    button.secondary {
-      background: linear-gradient(135deg, #1B5E20, #2E7D32);
-      font-size: 0.95rem;
-    }
+    button.secondary { background: linear-gradient(135deg, var(--green-darker), var(--green-dark)); font-size: 0.9rem; }
 
     #beatBtn:not(:disabled) {
-      background: linear-gradient(135deg, #E65100, #FF6D00, #FF9100);
+      background: linear-gradient(135deg, var(--orange-dark), var(--orange-primary), var(--orange-light));
       animation: beatPulse 2s ease-in-out infinite;
+      font-size: 1.1rem;
+      padding: 1rem;
     }
-
     @keyframes beatPulse {
-      0%, 100% { box-shadow: 0 0 10px rgba(255, 109, 0, 0.3); }
-      50% { box-shadow: 0 0 25px rgba(255, 109, 0, 0.6); }
+      0%, 100% { box-shadow: 0 0 10px rgba(255, 109, 0, 0.25); }
+      50% { box-shadow: 0 0 25px rgba(255, 109, 0, 0.5); }
     }
 
+    /* === INPUTS === */
     input {
       width: 100%;
-      padding: 0.8rem;
+      padding: 0.75rem;
       border-radius: 8px;
-      border: 1px solid rgba(76, 175, 80, 0.3);
+      border: 1px solid rgba(76, 175, 80, 0.2);
       background: rgba(10, 20, 10, 0.8);
-      color: #e0e0e0;
-      font-size: 1rem;
-      margin: 0.5rem 0;
+      color: var(--text-primary);
+      font-size: 0.95rem;
+      margin: 0.4rem 0;
       transition: border-color 0.3s;
     }
+    input:focus { outline: none; border-color: var(--green-primary); }
 
-    input:focus { outline: none; border-color: #4CAF50; }
-
-    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 0.5rem 0; }
+    /* === STATS === */
+    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin: 0.4rem 0; }
 
     .stat-box {
-      background: rgba(30, 60, 30, 0.6);
+      background: rgba(30, 60, 30, 0.5);
       border-radius: 12px;
-      padding: 1rem;
+      padding: 0.85rem;
       text-align: center;
-      border: 1px solid rgba(76, 175, 80, 0.15);
+      border: 1px solid rgba(76, 175, 80, 0.1);
     }
-
-    .stat-box .label { font-size: 0.75rem; color: #6a9a6a; text-transform: uppercase; letter-spacing: 1px; }
-
+    .stat-box .label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
     .stat-box .value {
       font-family: 'Righteous', cursive;
-      font-size: 2rem;
-      font-weight: bold;
-      color: #4CAF50;
+      font-size: 1.8rem;
+      color: var(--green-primary);
       transition: transform 0.3s;
     }
-
     .stat-box .value.pop { animation: popNumber 0.4s ease-out; }
-
     @keyframes popNumber {
       0% { transform: scale(1); }
-      50% { transform: scale(1.3); color: #FF9100; }
+      50% { transform: scale(1.3); color: var(--orange-light); }
       100% { transform: scale(1); }
     }
 
-    .status { margin: 0.75rem 0; padding: 0.8rem; border-radius: 10px; text-align: center; font-size: 0.9rem; }
-    .status.success { background: rgba(27, 67, 50, 0.8); color: #81C784; border: 1px solid rgba(76, 175, 80, 0.3); }
-    .status.error { background: rgba(61, 0, 0, 0.8); color: #ff6b6b; border: 1px solid rgba(255, 107, 107, 0.3); }
-    .status.info { background: rgba(26, 26, 78, 0.8); color: #a0a0ff; border: 1px solid rgba(160, 160, 255, 0.2); }
+    /* === STATUS === */
+    .status { margin: 0.6rem 0; padding: 0.7rem; border-radius: 10px; text-align: center; font-size: 0.85rem; }
+    .status.success { background: rgba(27, 67, 50, 0.8); color: var(--green-light); border: 1px solid rgba(76, 175, 80, 0.25); }
+    .status.error { background: rgba(61, 0, 0, 0.8); color: #ff6b6b; border: 1px solid rgba(255, 107, 107, 0.25); }
+    .status.info { background: rgba(26, 26, 78, 0.8); color: #a0a0ff; border: 1px solid rgba(160, 160, 255, 0.15); }
 
+    /* === ALPHA BANNER === */
     .alpha-banner {
-      background: linear-gradient(135deg, rgba(230, 81, 0, 0.8), rgba(46, 125, 50, 0.8));
+      background: linear-gradient(135deg, rgba(230, 81, 0, 0.7), rgba(46, 125, 50, 0.7));
       border-radius: 12px;
-      padding: 1rem;
+      padding: 0.85rem;
       text-align: center;
-      margin: 0.75rem 0;
+      margin: 0.6rem 0;
       font-weight: 600;
-      border: 1px solid rgba(255, 152, 0, 0.3);
+      font-size: 0.9rem;
+      border: 1px solid rgba(255, 152, 0, 0.2);
     }
 
-    .alpha-banner .crown { font-size: 1.2rem; }
+    /* === LEADERBOARD === */
+    .leaderboard-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0 0.35rem;
+    }
 
-    .builder-code {
+    .leaderboard-table th {
       font-size: 0.7rem;
-      color: rgba(106, 154, 106, 0.5);
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 0.4rem 0.6rem;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    .leaderboard-table th:last-child { text-align: right; }
+
+    .leaderboard-row {
+      background: rgba(30, 60, 30, 0.4);
+      border-radius: 8px;
+    }
+
+    .leaderboard-row td {
+      padding: 0.6rem;
+      font-size: 0.85rem;
+    }
+
+    .leaderboard-row td:first-child { border-radius: 8px 0 0 8px; width: 35px; text-align: center; }
+    .leaderboard-row td:last-child { border-radius: 0 8px 8px 0; text-align: right; font-family: 'Righteous', cursive; color: var(--green-primary); }
+
+    .rank-1 { color: #FFD700; font-weight: 700; }
+    .rank-2 { color: #C0C0C0; font-weight: 600; }
+    .rank-3 { color: #CD7F32; font-weight: 600; }
+
+    .addr-mono { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.8rem; color: #999; }
+
+    .leaderboard-empty { text-align: center; padding: 1.5rem; color: var(--text-muted); font-size: 0.85rem; }
+
+    /* === HOW IT WORKS === */
+    .how-it-works { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; margin-top: 0.5rem; }
+
+    .step {
+      text-align: center;
+      padding: 1rem 0.5rem;
+      background: rgba(30, 60, 30, 0.3);
+      border-radius: 12px;
+      border: 1px solid rgba(76, 175, 80, 0.08);
+    }
+
+    .step-icon { font-size: 1.8rem; margin-bottom: 0.4rem; }
+    .step-num { font-size: 0.65rem; color: var(--orange-primary); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 0.25rem; }
+    .step-text { font-size: 0.75rem; color: var(--text-muted); line-height: 1.4; }
+
+    /* === CONTRACT INFO === */
+    .contract-info {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      background: rgba(30, 60, 30, 0.3);
+      border-radius: 8px;
+      border: 1px solid rgba(76, 175, 80, 0.08);
+    }
+
+    .contract-info .label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+    .contract-info .addr { font-family: 'SF Mono', monospace; font-size: 0.75rem; color: #888; }
+    .contract-info a { color: var(--green-primary); text-decoration: none; font-size: 0.7rem; }
+    .contract-info a:hover { text-decoration: underline; }
+
+    /* === FOOTER === */
+    .footer {
+      width: 100%;
       margin-top: 2rem;
+      padding: 1.5rem;
+      border-top: 1px solid rgba(76, 175, 80, 0.1);
       text-align: center;
     }
 
-    a { color: #4CAF50; }
+    .footer-links { display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 0.75rem; flex-wrap: wrap; }
 
-    /* Vine decorations */
-    .vine-left, .vine-right {
-      position: fixed;
-      top: 0;
-      width: 60px;
-      height: 100%;
-      pointer-events: none;
-      z-index: -1;
+    .footer-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.8rem;
+      font-weight: 500;
+      transition: color 0.2s;
     }
+    .footer-links a:hover { color: var(--green-light); }
 
-    .vine-left {
-      left: 0;
-      background: linear-gradient(to right, rgba(34, 100, 34, 0.1), transparent);
-    }
+    .footer-meta { font-size: 0.65rem; color: rgba(106, 154, 106, 0.4); line-height: 1.6; }
 
-    .vine-right {
-      right: 0;
-      background: linear-gradient(to left, rgba(34, 100, 34, 0.1), transparent);
-    }
-
-    /* Floating leaves */
-    .leaf {
-      position: fixed;
-      font-size: 1.2rem;
-      opacity: 0.15;
-      pointer-events: none;
-      z-index: -1;
-      animation: leafFloat linear infinite;
-    }
-
-    @keyframes leafFloat {
-      0% { transform: translateY(-20px) rotate(0deg); opacity: 0; }
-      10% { opacity: 0.15; }
-      90% { opacity: 0.15; }
-      100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
-    }
-
-    /* Beat counter badge */
+    /* === BEAT FLASH === */
     .beat-flash {
-      position: fixed;
-      top: 50%;
-      left: 50%;
+      position: fixed; top: 50%; left: 50%;
       transform: translate(-50%, -50%);
       font-family: 'Righteous', cursive;
-      font-size: 5rem;
-      color: #FF9100;
+      font-size: 4.5rem;
+      color: var(--orange-light);
       opacity: 0;
       pointer-events: none;
       z-index: 200;
-      text-shadow: 0 0 40px rgba(255, 145, 0, 0.5);
+      text-shadow: 0 0 40px rgba(255, 145, 0, 0.4);
     }
-
-    .beat-flash.show {
-      animation: flashNumber 1s ease-out forwards;
-    }
-
+    .beat-flash.show { animation: flashNumber 1s ease-out forwards; }
     @keyframes flashNumber {
       0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
       20% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
       100% { opacity: 0; transform: translate(-50%, -60%) scale(1.5); }
     }
+
+    /* === RESPONSIVE === */
+    @media (max-width: 520px) {
+      h1 { font-size: 2rem; }
+      .gorilla { font-size: 4rem; }
+      .how-it-works { grid-template-columns: 1fr; }
+      .navbar { padding: 0.6rem 1rem; }
+      .nav-link { display: none; }
+      .stat-box .value { font-size: 1.5rem; }
+      .card { padding: 1.2rem; }
+    }
+
+    a { color: var(--green-primary); }
   </style>
 </head>
 <body>
@@ -336,62 +505,131 @@
   <div class="vine-left"></div>
   <div class="vine-right"></div>
 
-  <div class="gorilla-container">
-    <span class="gorilla" id="gorilla">&#x1F98D;</span>
-    <div class="impact-ring" id="ring1"></div>
-    <div class="impact-ring" id="ring2"></div>
-    <div class="impact-ring" id="ring3"></div>
-  </div>
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a href="#" class="nav-brand">
+      <span class="logo">&#x1F98D;</span>
+      <span class="brand-text">Gorilla Counter</span>
+    </a>
+    <div class="nav-right">
+      <a href="https://basescan.org/address/0x90fc6B668293Bc2d9Ce78eC6E1c2d0d2c00EE668" target="_blank" class="nav-link">Contract</a>
+      <a href="https://github.com/gorillachimps/gorilla-counter" target="_blank" class="nav-link">GitHub</a>
+      <div class="network-badge">
+        <div class="network-dot"></div>
+        Base Mainnet
+      </div>
+    </div>
+  </nav>
 
-  <h1>Gorilla Counter</h1>
-  <p class="subtitle">Beat your chest on Base!</p>
+  <!-- MAIN -->
+  <div class="main-content">
 
-  <div class="card">
-    <div id="wallet-section">
+    <div class="gorilla-container">
+      <span class="gorilla" id="gorilla">&#x1F98D;</span>
+      <div class="impact-ring" id="ring1"></div>
+      <div class="impact-ring" id="ring2"></div>
+      <div class="impact-ring" id="ring3"></div>
+    </div>
+
+    <h1>Gorilla Counter</h1>
+    <p class="subtitle">The onchain chest-beating competition on Base</p>
+
+    <!-- CONNECT -->
+    <div class="card">
       <button id="connectBtn" onclick="connectWallet()">&#x1F517; Connect Wallet</button>
-      <p id="walletAddr" style="font-size:0.75rem; margin-top:0.5rem; word-break:break-all; color:#6a9a6a;"></p>
+      <p id="walletAddr" style="font-size:0.7rem; margin-top:0.4rem; word-break:break-all; color:var(--text-muted); text-align:center;"></p>
     </div>
-  </div>
 
-  <div class="card">
-    <div class="stats">
-      <div class="stat-box">
-        <div class="label">Total Chest Beats</div>
-        <div class="value" id="totalBeats">-</div>
+    <!-- STATS -->
+    <div class="card">
+      <div class="stats">
+        <div class="stat-box">
+          <div class="label">Total Chest Beats</div>
+          <div class="value" id="totalBeats">-</div>
+        </div>
+        <div class="stat-box">
+          <div class="label">Your Beats</div>
+          <div class="value" id="yourBeats">-</div>
+        </div>
       </div>
-      <div class="stat-box">
-        <div class="label">Your Beats</div>
-        <div class="value" id="yourBeats">-</div>
+      <div class="alpha-banner" id="alphaBanner" style="display:none;">
+        &#x1F451; <strong>Alpha Gorilla:</strong> <span id="alphaAddr"></span>
+        &middot; <span id="alphaBeatsCount"></span> beats
       </div>
     </div>
-    <div class="alpha-banner" id="alphaBanner" style="display:none;">
-      <span class="crown">&#x1F451;</span> <strong>Alpha Gorilla:</strong> <span id="alphaAddr"></span>
-      <br><span id="alphaBeatsCount"></span> beats
+
+    <!-- BEAT -->
+    <div class="card">
+      <button id="beatBtn" onclick="beatChest()" disabled>&#x1F4A5; Beat Chest!</button>
+      <div style="margin-top: 0.75rem;">
+        <input type="text" id="nameInput" placeholder="Enter your gorilla name..." maxlength="32">
+        <button class="secondary" id="nameBtn" onclick="setName()" disabled>&#x1F3F7; Set Name</button>
+      </div>
     </div>
+
+    <div id="statusMsg"></div>
+
+    <!-- LEADERBOARD -->
+    <div class="card">
+      <h2>&#x1F3C6; Leaderboard</h2>
+      <div id="leaderboard">
+        <div class="leaderboard-empty">Connect wallet &amp; beat your chest to appear here</div>
+      </div>
+    </div>
+
+    <!-- HOW IT WORKS -->
+    <div class="card">
+      <h2>How It Works</h2>
+      <div class="how-it-works">
+        <div class="step">
+          <div class="step-icon">&#x1F517;</div>
+          <div class="step-num">Step 1</div>
+          <div class="step-text">Connect your wallet to Base</div>
+        </div>
+        <div class="step">
+          <div class="step-icon">&#x1F4A5;</div>
+          <div class="step-num">Step 2</div>
+          <div class="step-text">Beat your chest onchain</div>
+        </div>
+        <div class="step">
+          <div class="step-icon">&#x1F451;</div>
+          <div class="step-num">Step 3</div>
+          <div class="step-text">Most beats = Alpha Gorilla</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTRACT INFO -->
+    <div class="contract-info">
+      <span class="label">Contract:</span>
+      <span class="addr">0x90fc...E668</span>
+      <a href="https://basescan.org/address/0x90fc6B668293Bc2d9Ce78eC6E1c2d0d2c00EE668" target="_blank">View &#x2197;</a>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <div class="footer-links">
+        <a href="https://basescan.org/address/0x90fc6B668293Bc2d9Ce78eC6E1c2d0d2c00EE668" target="_blank">Basescan</a>
+        <a href="https://github.com/gorillachimps/gorilla-counter" target="_blank">GitHub</a>
+        <a href="https://base.dev" target="_blank">Base.dev</a>
+        <a href="https://base.org" target="_blank">Base</a>
+      </div>
+      <div class="footer-meta">
+        Builder Code: bc_5jexnr1x &middot; ERC-8021 Attribution &middot; Built on Base
+      </div>
+    </footer>
   </div>
 
-  <div class="card">
-    <button id="beatBtn" onclick="beatChest()" disabled>&#x1F4A5; Beat Chest!</button>
-    <div style="margin-top: 1rem;">
-      <input type="text" id="nameInput" placeholder="Enter your gorilla name..." maxlength="32">
-      <button class="secondary" id="nameBtn" onclick="setName()" disabled>&#x1F3F7; Set Name</button>
-    </div>
-  </div>
-
-  <div id="statusMsg"></div>
   <div class="beat-flash" id="beatFlash"></div>
-
-  <p class="builder-code">Builder Code: bc_5jexnr1x | ERC-8021 Attribution | Built on Base</p>
 
   <!-- Floating leaves -->
   <script>
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 6; i++) {
       const leaf = document.createElement('div');
       leaf.className = 'leaf';
-      leaf.textContent = ['&#127811;', '&#127812;', '&#127793;'][Math.floor(Math.random() * 3)];
-      leaf.innerHTML = ['&#127811;', '&#127812;', '&#127793;'][Math.floor(Math.random() * 3)];
+      leaf.innerHTML = ['\u{1F343}', '\u{1F344}', '\u{1F331}'][Math.floor(Math.random() * 3)];
       leaf.style.left = Math.random() * 100 + '%';
-      leaf.style.animationDuration = (12 + Math.random() * 18) + 's';
+      leaf.style.animationDuration = (14 + Math.random() * 20) + 's';
       leaf.style.animationDelay = (Math.random() * 15) + 's';
       document.body.appendChild(leaf);
     }
@@ -403,43 +641,30 @@
     const ctx = canvas.getContext('2d');
     let particles = [];
 
-    function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    }
+    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
     class Particle {
       constructor(x, y, type) {
-        this.x = x;
-        this.y = y;
-        this.type = type;
+        this.x = x; this.y = y; this.type = type;
         this.vx = (Math.random() - 0.5) * 12;
         this.vy = (Math.random() - 0.5) * 12 - 4;
-        this.life = 1;
-        this.decay = 0.015 + Math.random() * 0.015;
-        this.size = 4 + Math.random() * 8;
-        this.gravity = 0.15;
+        this.life = 1; this.decay = 0.015 + Math.random() * 0.015;
+        this.size = 4 + Math.random() * 8; this.gravity = 0.15;
         this.rotation = Math.random() * Math.PI * 2;
         this.rotSpeed = (Math.random() - 0.5) * 0.2;
       }
-
       update() {
-        this.x += this.vx;
-        this.vy += this.gravity;
-        this.y += this.vy;
-        this.vx *= 0.98;
-        this.life -= this.decay;
-        this.rotation += this.rotSpeed;
+        this.x += this.vx; this.vy += this.gravity;
+        this.y += this.vy; this.vx *= 0.98;
+        this.life -= this.decay; this.rotation += this.rotSpeed;
       }
-
       draw() {
         ctx.save();
         ctx.translate(this.x, this.y);
         ctx.rotate(this.rotation);
         ctx.globalAlpha = this.life;
-
         if (this.type === 'banana') {
           ctx.font = this.size * 2 + 'px serif';
           ctx.fillText('\u{1F34C}', -this.size, this.size / 2);
@@ -447,26 +672,22 @@
           ctx.fillStyle = '#FF9100';
           ctx.beginPath();
           for (let i = 0; i < 5; i++) {
-            const angle = (i * 4 * Math.PI) / 5 - Math.PI / 2;
-            const method = i === 0 ? 'moveTo' : 'lineTo';
-            ctx[method](Math.cos(angle) * this.size, Math.sin(angle) * this.size);
+            const a = (i * 4 * Math.PI) / 5 - Math.PI / 2;
+            ctx[i === 0 ? 'moveTo' : 'lineTo'](Math.cos(a) * this.size, Math.sin(a) * this.size);
           }
           ctx.fill();
         } else {
           ctx.fillStyle = this.type === 'green' ? '#4CAF50' : '#FF6D00';
           ctx.fillRect(-this.size / 2, -this.size / 2, this.size, this.size);
         }
-
         ctx.restore();
       }
     }
 
     function spawnBeatParticles() {
-      const cx = window.innerWidth / 2;
-      const cy = window.innerHeight * 0.15;
+      const cx = window.innerWidth / 2, cy = window.innerHeight * 0.18;
       for (let i = 0; i < 25; i++) {
-        const types = ['banana', 'star', 'green', 'orange'];
-        particles.push(new Particle(cx, cy, types[Math.floor(Math.random() * types.length)]));
+        particles.push(new Particle(cx, cy, ['banana', 'star', 'green', 'orange'][Math.floor(Math.random() * 4)]));
       }
     }
 
@@ -480,49 +701,28 @@
 
     // ==== BEAT ANIMATION ====
     function triggerBeatAnimation() {
-      // Gorilla animation
       const gorilla = document.getElementById('gorilla');
-      gorilla.classList.remove('beating');
-      void gorilla.offsetWidth;
-      gorilla.classList.add('beating');
+      gorilla.classList.remove('beating'); void gorilla.offsetWidth; gorilla.classList.add('beating');
 
-      // Impact rings
       [1, 2, 3].forEach((n, i) => {
         const ring = document.getElementById('ring' + n);
-        setTimeout(() => {
-          ring.classList.remove('active');
-          void ring.offsetWidth;
-          ring.classList.add('active');
-        }, i * 150);
+        setTimeout(() => { ring.classList.remove('active'); void ring.offsetWidth; ring.classList.add('active'); }, i * 150);
       });
 
-      // Screen shake
-      document.body.classList.remove('shake');
-      void document.body.offsetWidth;
-      document.body.classList.add('shake');
-
-      // Particles
+      document.body.classList.remove('shake'); void document.body.offsetWidth; document.body.classList.add('shake');
       spawnBeatParticles();
 
-      // Number pop
       document.querySelectorAll('.stat-box .value').forEach(el => {
-        el.classList.remove('pop');
-        void el.offsetWidth;
-        el.classList.add('pop');
+        el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop');
       });
     }
 
     // ==== CONFIGURATION ====
     const CONTRACT_ADDRESS = '0x90fc6B668293Bc2d9Ce78eC6E1c2d0d2c00EE668';
-
-    // Base Mainnet chain config
-    const BASE_CHAIN_ID = '0x2105'; // 8453
+    const BASE_CHAIN_ID = '0x2105';
     const BASE_RPC = 'https://mainnet.base.org';
-
-    // ERC-8021 dataSuffix for builder code: bc_5jexnr1x
     const DATA_SUFFIX = '0x0b62635f356a65786e7231780080218021802180218021802180218021';
 
-    // Function selectors (first 4 bytes of keccak256)
     const SELECTORS = {
       chestBeats: '0x29275322',
       gorillaBeats: '0xd8b7610a',
@@ -537,54 +737,42 @@
 
     // ==== HELPERS ====
     function showStatus(msg, type) {
-      const el = document.getElementById('statusMsg');
-      el.innerHTML = `<div class="status ${type}">${msg}</div>`;
+      document.getElementById('statusMsg').innerHTML = `<div class="status ${type}">${msg}</div>`;
     }
-
-    function encodeAddress(addr) {
-      return addr.slice(2).toLowerCase().padStart(64, '0');
-    }
-
+    function encodeAddress(addr) { return addr.slice(2).toLowerCase().padStart(64, '0'); }
     function encodeString(str) {
       const hex = Array.from(new TextEncoder().encode(str)).map(b => b.toString(16).padStart(2, '0')).join('');
-      const offset = '0000000000000000000000000000000000000000000000000000000000000020';
-      const length = str.length.toString(16).padStart(64, '0');
-      const padded = hex.padEnd(Math.ceil(hex.length / 64) * 64, '0');
-      return offset + length + padded;
+      return '0000000000000000000000000000000000000000000000000000000000000020' +
+        str.length.toString(16).padStart(64, '0') +
+        hex.padEnd(Math.ceil(hex.length / 64) * 64, '0');
     }
-
-    function decodeUint256(hex) {
-      if (!hex || hex === '0x') return 0;
-      return parseInt(hex, 16);
-    }
-
-    function decodeAddress(hex) {
-      return '0x' + hex.slice(-40);
+    function decodeUint256(hex) { return (!hex || hex === '0x') ? 0 : parseInt(hex, 16); }
+    function decodeAddress(hex) { return '0x' + hex.slice(-40); }
+    function decodeString(hex) {
+      if (!hex || hex === '0x' || hex.length < 130) return '';
+      try {
+        const len = parseInt(hex.slice(66, 130), 16);
+        if (len === 0 || len > 32) return '';
+        const strHex = hex.slice(130, 130 + len * 2);
+        return strHex.match(/.{2}/g).map(b => String.fromCharCode(parseInt(b, 16))).join('');
+      } catch { return ''; }
     }
 
     async function ethCall(data) {
       const resp = await fetch(BASE_RPC, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          jsonrpc: '2.0', id: 1, method: 'eth_call',
-          params: [{ to: CONTRACT_ADDRESS, data }, 'latest']
-        })
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'eth_call', params: [{ to: CONTRACT_ADDRESS, data }, 'latest'] })
       });
       const json = await resp.json();
-      if (json.error) {
-        console.error('RPC error:', json.error);
-        return '0x0';
-      }
+      if (json.error) { console.error('RPC error:', json.error); return '0x0'; }
       return json.result || '0x0';
     }
 
+    function appendSuffix(calldata) { return calldata + DATA_SUFFIX.slice(2); }
+
     // ==== WALLET ====
     async function connectWallet() {
-      if (!window.ethereum) {
-        showStatus('No wallet detected. Install MetaMask or Coinbase Wallet.', 'error');
-        return;
-      }
+      if (!window.ethereum) { showStatus('No wallet detected. Install MetaMask or Coinbase Wallet.', 'error'); return; }
       try {
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         userAddress = accounts[0];
@@ -594,40 +782,75 @@
         document.getElementById('beatBtn').disabled = false;
         document.getElementById('nameBtn').disabled = false;
 
-        // Switch to Base Mainnet
         try {
-          await window.ethereum.request({
-            method: 'wallet_switchEthereumChain',
-            params: [{ chainId: BASE_CHAIN_ID }],
-          });
+          await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: BASE_CHAIN_ID }] });
         } catch (switchErr) {
           if (switchErr.code === 4902) {
-            await window.ethereum.request({
-              method: 'wallet_addEthereumChain',
-              params: [{
-                chainId: BASE_CHAIN_ID,
-                chainName: 'Base',
-                nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
-                rpcUrls: [BASE_RPC],
-                blockExplorerUrls: ['https://basescan.org'],
-              }],
-            });
+            await window.ethereum.request({ method: 'wallet_addEthereumChain', params: [{ chainId: BASE_CHAIN_ID, chainName: 'Base', nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 }, rpcUrls: [BASE_RPC], blockExplorerUrls: ['https://basescan.org'] }] });
           }
         }
 
-        showStatus('Wallet connected! Network: Base Mainnet', 'success');
+        showStatus('Wallet connected to Base Mainnet', 'success');
         refreshStats();
-      } catch (err) {
-        showStatus('Connection failed: ' + err.message, 'error');
+      } catch (err) { showStatus('Connection failed: ' + err.message, 'error'); }
+    }
+
+    // ==== LEADERBOARD ====
+    // We track known addresses from events. For now, show alpha + user.
+    async function buildLeaderboard() {
+      const entries = [];
+
+      // Get alpha
+      const alphaHex = await ethCall(SELECTORS.alphaGorilla);
+      const alphaAddr = decodeAddress(alphaHex);
+      if (alphaAddr !== '0x0000000000000000000000000000000000000000') {
+        const alphaBeatsHex = await ethCall(SELECTORS.alphaBeats);
+        const alphaNameHex = await ethCall(SELECTORS.gorillaNames + encodeAddress(alphaAddr));
+        entries.push({
+          addr: alphaAddr,
+          beats: decodeUint256(alphaBeatsHex),
+          name: decodeString(alphaNameHex),
+        });
       }
+
+      // Add user if different from alpha
+      if (userAddress && userAddress.toLowerCase() !== alphaAddr.toLowerCase()) {
+        const userBeatsHex = await ethCall(SELECTORS.gorillaBeats + encodeAddress(userAddress));
+        const userBeats = decodeUint256(userBeatsHex);
+        if (userBeats > 0) {
+          const userNameHex = await ethCall(SELECTORS.gorillaNames + encodeAddress(userAddress));
+          entries.push({
+            addr: userAddress,
+            beats: userBeats,
+            name: decodeString(userNameHex),
+          });
+        }
+      }
+
+      entries.sort((a, b) => b.beats - a.beats);
+
+      const container = document.getElementById('leaderboard');
+      if (entries.length === 0) {
+        container.innerHTML = '<div class="leaderboard-empty">No chest beats yet. Be the first!</div>';
+        return;
+      }
+
+      const rankEmoji = ['&#x1F947;', '&#x1F948;', '&#x1F949;'];
+      let html = '<table class="leaderboard-table"><thead><tr><th>#</th><th>Gorilla</th><th>Beats</th></tr></thead><tbody>';
+      entries.forEach((e, i) => {
+        const rank = i < 3 ? rankEmoji[i] : (i + 1);
+        const rankClass = i < 3 ? `rank-${i + 1}` : '';
+        const display = e.name || (e.addr.slice(0, 6) + '...' + e.addr.slice(-4));
+        const displayClass = e.name ? '' : 'addr-mono';
+        html += `<tr class="leaderboard-row"><td class="${rankClass}">${rank}</td><td class="${displayClass}">${display}</td><td>${e.beats}</td></tr>`;
+      });
+      html += '</tbody></table>';
+      container.innerHTML = html;
     }
 
     // ==== READ STATS ====
     async function refreshStats() {
-      if (!CONTRACT_ADDRESS || CONTRACT_ADDRESS === 'PASTE_YOUR_CONTRACT_ADDRESS_HERE') {
-        showStatus('Deploy the contract first, then paste the address in index.html', 'info');
-        return;
-      }
+      if (!CONTRACT_ADDRESS || CONTRACT_ADDRESS === 'PASTE_YOUR_CONTRACT_ADDRESS_HERE') return;
       try {
         const total = await ethCall(SELECTORS.chestBeats);
         document.getElementById('totalBeats').textContent = decodeUint256(total);
@@ -645,74 +868,49 @@
           document.getElementById('alphaAddr').textContent = alphaAddr.slice(0, 6) + '...' + alphaAddr.slice(-4);
           document.getElementById('alphaBeatsCount').textContent = decodeUint256(alphaB);
         }
-      } catch (err) {
-        console.error('Stats error:', err);
-      }
+
+        buildLeaderboard();
+      } catch (err) { console.error('Stats error:', err); }
     }
 
-    // ==== WRITE TRANSACTIONS (with ERC-8021 attribution) ====
-    function appendSuffix(calldata) {
-      return calldata + DATA_SUFFIX.slice(2);
-    }
-
+    // ==== TRANSACTIONS ====
     async function beatChest() {
       if (!userAddress) return;
       try {
         showStatus('Sending chest beat transaction...', 'info');
         triggerBeatAnimation();
 
-        const txData = appendSuffix(SELECTORS.beatChest);
         const txHash = await window.ethereum.request({
           method: 'eth_sendTransaction',
-          params: [{
-            from: userAddress,
-            to: CONTRACT_ADDRESS,
-            data: txData,
-          }],
+          params: [{ from: userAddress, to: CONTRACT_ADDRESS, data: appendSuffix(SELECTORS.beatChest) }],
         });
 
-        // Flash the new beat count
         const flash = document.getElementById('beatFlash');
-        const current = parseInt(document.getElementById('totalBeats').textContent) || 0;
-        flash.textContent = current + 1;
-        flash.classList.remove('show');
-        void flash.offsetWidth;
-        flash.classList.add('show');
+        flash.textContent = (parseInt(document.getElementById('totalBeats').textContent) || 0) + 1;
+        flash.classList.remove('show'); void flash.offsetWidth; flash.classList.add('show');
 
-        showStatus(`Chest beaten! TX: <a href="https://basescan.org/tx/${txHash}" target="_blank">${txHash.slice(0, 10)}...</a>`, 'success');
+        showStatus(`Chest beaten! <a href="https://basescan.org/tx/${txHash}" target="_blank">View TX &#x2197;</a>`, 'success');
         setTimeout(refreshStats, 3000);
-      } catch (err) {
-        showStatus('Transaction failed: ' + err.message, 'error');
-      }
+      } catch (err) { showStatus('Transaction failed: ' + err.message, 'error'); }
     }
 
     async function setName() {
       if (!userAddress) return;
       const name = document.getElementById('nameInput').value.trim();
-      if (!name || name.length > 32) {
-        showStatus('Name must be 1-32 characters', 'error');
-        return;
-      }
+      if (!name || name.length > 32) { showStatus('Name must be 1-32 characters', 'error'); return; }
       try {
         showStatus('Setting gorilla name...', 'info');
-        const txData = appendSuffix(SELECTORS.setGorillaName + encodeString(name));
         const txHash = await window.ethereum.request({
           method: 'eth_sendTransaction',
-          params: [{
-            from: userAddress,
-            to: CONTRACT_ADDRESS,
-            data: txData,
-          }],
+          params: [{ from: userAddress, to: CONTRACT_ADDRESS, data: appendSuffix(SELECTORS.setGorillaName + encodeString(name)) }],
         });
-        showStatus(`Name set! TX: <a href="https://basescan.org/tx/${txHash}" target="_blank">${txHash.slice(0, 10)}...</a>`, 'success');
-      } catch (err) {
-        showStatus('Transaction failed: ' + err.message, 'error');
-      }
+        showStatus(`Name set! <a href="https://basescan.org/tx/${txHash}" target="_blank">View TX &#x2197;</a>`, 'success');
+        setTimeout(refreshStats, 3000);
+      } catch (err) { showStatus('Transaction failed: ' + err.message, 'error'); }
     }
 
-    // Refresh stats on load
+    // Init
     refreshStats();
-    // Auto-refresh every 15 seconds
     setInterval(refreshStats, 15000);
   </script>
 </body>
