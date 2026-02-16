@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gorilla Counter - Base</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #1a1a2e;
+      color: #e0e0e0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+    }
+    h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+    .gorilla-emoji { font-size: 4rem; margin: 1rem 0; }
+    .card {
+      background: #16213e;
+      border-radius: 16px;
+      padding: 2rem;
+      margin: 1rem 0;
+      width: 100%;
+      max-width: 500px;
+      border: 1px solid #0f3460;
+    }
+    button {
+      background: #e94560;
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 12px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      width: 100%;
+      margin: 0.5rem 0;
+      transition: background 0.2s;
+    }
+    button:hover { background: #c73650; }
+    button:disabled { background: #555; cursor: not-allowed; }
+    button.secondary { background: #0f3460; }
+    button.secondary:hover { background: #1a4a8a; }
+    input {
+      width: 100%;
+      padding: 0.8rem;
+      border-radius: 8px;
+      border: 1px solid #0f3460;
+      background: #1a1a2e;
+      color: #e0e0e0;
+      font-size: 1rem;
+      margin: 0.5rem 0;
+    }
+    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+    .stat-box {
+      background: #0f3460;
+      border-radius: 12px;
+      padding: 1rem;
+      text-align: center;
+    }
+    .stat-box .label { font-size: 0.8rem; color: #aaa; }
+    .stat-box .value { font-size: 1.8rem; font-weight: bold; color: #e94560; }
+    .status { margin: 1rem 0; padding: 0.8rem; border-radius: 8px; text-align: center; font-size: 0.9rem; }
+    .status.success { background: #1b4332; color: #95d5b2; }
+    .status.error { background: #3d0000; color: #ff6b6b; }
+    .status.info { background: #1a1a4e; color: #a0a0ff; }
+    .alpha-banner {
+      background: linear-gradient(135deg, #e94560, #0f3460);
+      border-radius: 12px;
+      padding: 1rem;
+      text-align: center;
+      margin: 1rem 0;
+    }
+    .builder-code { font-size: 0.75rem; color: #666; margin-top: 2rem; }
+    a { color: #e94560; }
+  </style>
+</head>
+<body>
+  <div class="gorilla-emoji">&#x1F98D;</div>
+  <h1>Gorilla Counter</h1>
+  <p>Beat your chest on Base!</p>
+
+  <div class="card">
+    <div id="wallet-section">
+      <button id="connectBtn" onclick="connectWallet()">Connect Wallet</button>
+      <p id="walletAddr" style="font-size:0.8rem; margin-top:0.5rem; word-break:break-all;"></p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="stats">
+      <div class="stat-box">
+        <div class="label">Total Chest Beats</div>
+        <div class="value" id="totalBeats">-</div>
+      </div>
+      <div class="stat-box">
+        <div class="label">Your Beats</div>
+        <div class="value" id="yourBeats">-</div>
+      </div>
+    </div>
+    <div class="alpha-banner" id="alphaBanner" style="display:none;">
+      <strong>Alpha Gorilla:</strong> <span id="alphaAddr"></span>
+      <br><span id="alphaBeatsCount"></span> beats
+    </div>
+  </div>
+
+  <div class="card">
+    <button id="beatBtn" onclick="beatChest()" disabled>Beat Chest!</button>
+    <div style="margin-top: 1rem;">
+      <input type="text" id="nameInput" placeholder="Set your gorilla name (max 32 chars)" maxlength="32">
+      <button class="secondary" id="nameBtn" onclick="setName()" disabled>Set Name</button>
+    </div>
+  </div>
+
+  <div id="statusMsg"></div>
+
+  <p class="builder-code">Builder Code: bc_5jexnr1x | ERC-8021 Attribution</p>
+
+  <script>
+    // ==== CONFIGURATION ====
+    const CONTRACT_ADDRESS = '0x90fc6B668293Bc2d9Ce78eC6E1c2d0d2c00EE668';
+
+    // Base Mainnet chain config
+    const BASE_CHAIN_ID = '0x2105'; // 8453
+    const BASE_RPC = 'https://mainnet.base.org';
+
+    // ERC-8021 dataSuffix for builder code: bc_5jexnr1x
+    const DATA_SUFFIX = '0x0b62635f356a65786e7231780080218021802180218021802180218021';
+
+    // Contract ABI (only the functions we use)
+    const ABI = {
+      chestBeats: { name: 'chestBeats', type: 'function', inputs: [], outputs: [{ type: 'uint256' }], stateMutability: 'view' },
+      gorillaBeats: { name: 'gorillaBeats', type: 'function', inputs: [{ type: 'address' }], outputs: [{ type: 'uint256' }], stateMutability: 'view' },
+      alphaGorilla: { name: 'alphaGorilla', type: 'function', inputs: [], outputs: [{ type: 'address' }], stateMutability: 'view' },
+      alphaBeats: { name: 'alphaBeats', type: 'function', inputs: [], outputs: [{ type: 'uint256' }], stateMutability: 'view' },
+      beatChest: { name: 'beatChest', type: 'function', inputs: [], outputs: [], stateMutability: 'nonpayable' },
+      setGorillaName: { name: 'setGorillaName', type: 'function', inputs: [{ type: 'string' }], outputs: [], stateMutability: 'nonpayable' },
+      gorillaNames: { name: 'gorillaNames', type: 'function', inputs: [{ type: 'address' }], outputs: [{ type: 'string' }], stateMutability: 'view' },
+    };
+
+    // Function selectors (first 4 bytes of keccak256)
+    const SELECTORS = {
+      chestBeats: '0x29275322',
+      gorillaBeats: '0xd8b7610a',
+      alphaGorilla: '0x71c37d99',
+      alphaBeats: '0xf1672354',
+      beatChest: '0x7859c895',
+      setGorillaName: '0x0c216802',
+      gorillaNames: '0xdff490f8',
+    };
+
+    let userAddress = null;
+
+    // ==== HELPERS ====
+    function showStatus(msg, type) {
+      const el = document.getElementById('statusMsg');
+      el.innerHTML = `<div class="status ${type}">${msg}</div>`;
+    }
+
+    function encodeAddress(addr) {
+      return addr.slice(2).toLowerCase().padStart(64, '0');
+    }
+
+    function encodeString(str) {
+      const hex = Array.from(new TextEncoder().encode(str)).map(b => b.toString(16).padStart(2, '0')).join('');
+      const offset = '0000000000000000000000000000000000000000000000000000000000000020';
+      const length = str.length.toString(16).padStart(64, '0');
+      const padded = hex.padEnd(Math.ceil(hex.length / 64) * 64, '0');
+      return offset + length + padded;
+    }
+
+    function decodeUint256(hex) {
+      if (!hex || hex === '0x') return 0;
+      return parseInt(hex, 16);
+    }
+
+    function decodeAddress(hex) {
+      return '0x' + hex.slice(-40);
+    }
+
+    async function ethCall(data) {
+      const resp = await fetch(BASE_RPC, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          jsonrpc: '2.0', id: 1, method: 'eth_call',
+          params: [{ to: CONTRACT_ADDRESS, data }, 'latest']
+        })
+      });
+      const json = await resp.json();
+      if (json.error) {
+        console.error('RPC error:', json.error);
+        return '0x0';
+      }
+      return json.result || '0x0';
+    }
+
+    // ==== WALLET ====
+    async function connectWallet() {
+      if (!window.ethereum) {
+        showStatus('No wallet detected. Install MetaMask or Coinbase Wallet.', 'error');
+        return;
+      }
+      try {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        userAddress = accounts[0];
+        document.getElementById('walletAddr').textContent = userAddress;
+        document.getElementById('connectBtn').textContent = 'Connected';
+        document.getElementById('connectBtn').disabled = true;
+        document.getElementById('beatBtn').disabled = false;
+        document.getElementById('nameBtn').disabled = false;
+
+        // Switch to Base Mainnet
+        try {
+          await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: BASE_CHAIN_ID }],
+          });
+        } catch (switchErr) {
+          if (switchErr.code === 4902) {
+            await window.ethereum.request({
+              method: 'wallet_addEthereumChain',
+              params: [{
+                chainId: BASE_CHAIN_ID,
+                chainName: 'Base',
+                nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+                rpcUrls: [BASE_RPC],
+                blockExplorerUrls: ['https://basescan.org'],
+              }],
+            });
+          }
+        }
+
+        showStatus('Wallet connected! Network: Base Mainnet', 'success');
+        refreshStats();
+      } catch (err) {
+        showStatus('Connection failed: ' + err.message, 'error');
+      }
+    }
+
+    // ==== READ STATS ====
+    async function refreshStats() {
+      if (!CONTRACT_ADDRESS || CONTRACT_ADDRESS === 'PASTE_YOUR_CONTRACT_ADDRESS_HERE') {
+        showStatus('Deploy the contract first, then paste the address in index.html', 'info');
+        return;
+      }
+      try {
+        const total = await ethCall(SELECTORS.chestBeats);
+        document.getElementById('totalBeats').textContent = decodeUint256(total);
+
+        if (userAddress) {
+          const yours = await ethCall(SELECTORS.gorillaBeats + encodeAddress(userAddress));
+          document.getElementById('yourBeats').textContent = decodeUint256(yours);
+        }
+
+        const alpha = await ethCall(SELECTORS.alphaGorilla);
+        const alphaAddr = decodeAddress(alpha);
+        if (alphaAddr !== '0x0000000000000000000000000000000000000000') {
+          const alphaB = await ethCall(SELECTORS.alphaBeats);
+          document.getElementById('alphaBanner').style.display = 'block';
+          document.getElementById('alphaAddr').textContent = alphaAddr.slice(0, 6) + '...' + alphaAddr.slice(-4);
+          document.getElementById('alphaBeatsCount').textContent = decodeUint256(alphaB);
+        }
+      } catch (err) {
+        console.error('Stats error:', err);
+      }
+    }
+
+    // ==== WRITE TRANSACTIONS (with ERC-8021 attribution) ====
+    function appendSuffix(calldata) {
+      // Append ERC-8021 dataSuffix for builder code attribution
+      return calldata + DATA_SUFFIX.slice(2);
+    }
+
+    async function beatChest() {
+      if (!userAddress) return;
+      try {
+        showStatus('Sending chest beat transaction...', 'info');
+        const txData = appendSuffix(SELECTORS.beatChest);
+        const txHash = await window.ethereum.request({
+          method: 'eth_sendTransaction',
+          params: [{
+            from: userAddress,
+            to: CONTRACT_ADDRESS,
+            data: txData,
+          }],
+        });
+        showStatus(`Chest beaten! TX: <a href="https://basescan.org/tx/${txHash}" target="_blank">${txHash.slice(0, 10)}...</a>`, 'success');
+        setTimeout(refreshStats, 3000);
+      } catch (err) {
+        showStatus('Transaction failed: ' + err.message, 'error');
+      }
+    }
+
+    async function setName() {
+      if (!userAddress) return;
+      const name = document.getElementById('nameInput').value.trim();
+      if (!name || name.length > 32) {
+        showStatus('Name must be 1-32 characters', 'error');
+        return;
+      }
+      try {
+        showStatus('Setting gorilla name...', 'info');
+        const txData = appendSuffix(SELECTORS.setGorillaName + encodeString(name));
+        const txHash = await window.ethereum.request({
+          method: 'eth_sendTransaction',
+          params: [{
+            from: userAddress,
+            to: CONTRACT_ADDRESS,
+            data: txData,
+          }],
+        });
+        showStatus(`Name set! TX: <a href="https://basescan.org/tx/${txHash}" target="_blank">${txHash.slice(0, 10)}...</a>`, 'success');
+      } catch (err) {
+        showStatus('Transaction failed: ' + err.message, 'error');
+      }
+    }
+
+    // Refresh stats on load
+    refreshStats();
+    // Auto-refresh every 15 seconds
+    setInterval(refreshStats, 15000);
+  </script>
+</body>
+</html>
