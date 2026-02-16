@@ -5,87 +5,351 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gorilla Counter - Base</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Righteous&family=Inter:wght@400;600;700&display=swap');
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
+
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #1a1a2e;
+      font-family: 'Inter', sans-serif;
+      background: #0a0f0a;
       color: #e0e0e0;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 2rem;
+      padding: 2rem 1rem;
+      overflow-x: hidden;
+      position: relative;
     }
-    h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
-    .gorilla-emoji { font-size: 4rem; margin: 1rem 0; }
+
+    /* Jungle background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background:
+        radial-gradient(ellipse at 20% 80%, rgba(34, 139, 34, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(0, 100, 0, 0.1) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 50%, rgba(20, 60, 20, 0.2) 0%, transparent 70%),
+        linear-gradient(180deg, #0a0f0a 0%, #0d1a0d 50%, #0a0f0a 100%);
+      z-index: -2;
+    }
+
+    /* Animated fog/mist */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 0; left: -50%; right: -50%; bottom: 0;
+      background:
+        radial-gradient(ellipse at 30% 70%, rgba(100, 200, 100, 0.03) 0%, transparent 50%),
+        radial-gradient(ellipse at 70% 30%, rgba(50, 150, 50, 0.03) 0%, transparent 50%);
+      animation: fogDrift 20s ease-in-out infinite;
+      z-index: -1;
+    }
+
+    @keyframes fogDrift {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(10%); }
+    }
+
+    /* Particle canvas */
+    #particles {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    /* Gorilla section */
+    .gorilla-container {
+      position: relative;
+      margin: 1rem 0 0.5rem;
+      cursor: default;
+      user-select: none;
+    }
+
+    .gorilla {
+      font-size: 6rem;
+      display: block;
+      transition: transform 0.1s;
+      filter: drop-shadow(0 0 30px rgba(34, 139, 34, 0.3));
+    }
+
+    .gorilla.beating {
+      animation: chestBeat 0.6s ease-out;
+    }
+
+    @keyframes chestBeat {
+      0% { transform: scale(1); }
+      15% { transform: scale(1.3) rotate(-5deg); }
+      30% { transform: scale(0.9) rotate(5deg); }
+      45% { transform: scale(1.2) rotate(-3deg); }
+      60% { transform: scale(0.95); }
+      80% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    /* Impact rings */
+    .impact-ring {
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 20px; height: 20px;
+      border: 3px solid rgba(76, 175, 80, 0.8);
+      border-radius: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      pointer-events: none;
+    }
+
+    .impact-ring.active {
+      animation: impactExpand 0.8s ease-out forwards;
+    }
+
+    @keyframes impactExpand {
+      0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+      100% { transform: translate(-50%, -50%) scale(8); opacity: 0; }
+    }
+
+    /* Screen shake */
+    .shake { animation: screenShake 0.4s ease-out; }
+
+    @keyframes screenShake {
+      0%, 100% { transform: translate(0); }
+      10% { transform: translate(-8px, 4px); }
+      20% { transform: translate(6px, -6px); }
+      30% { transform: translate(-4px, 2px); }
+      40% { transform: translate(4px, -2px); }
+      50% { transform: translate(-2px, 4px); }
+      60% { transform: translate(2px, -2px); }
+      70% { transform: translate(-1px, 1px); }
+    }
+
+    h1 {
+      font-family: 'Righteous', cursive;
+      font-size: 2.8rem;
+      margin-bottom: 0.3rem;
+      background: linear-gradient(135deg, #4CAF50, #81C784, #A5D6A7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-shadow: none;
+    }
+
+    .subtitle {
+      color: #6a9a6a;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
+
     .card {
-      background: #16213e;
+      background: rgba(15, 30, 15, 0.8);
+      backdrop-filter: blur(10px);
       border-radius: 16px;
-      padding: 2rem;
-      margin: 1rem 0;
+      padding: 1.5rem;
+      margin: 0.75rem 0;
       width: 100%;
-      max-width: 500px;
-      border: 1px solid #0f3460;
+      max-width: 480px;
+      border: 1px solid rgba(76, 175, 80, 0.2);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
     }
+
     button {
-      background: #e94560;
+      background: linear-gradient(135deg, #2E7D32, #4CAF50);
       color: white;
       border: none;
       padding: 1rem 2rem;
       border-radius: 12px;
-      font-size: 1.2rem;
+      font-size: 1.1rem;
+      font-weight: 700;
       cursor: pointer;
       width: 100%;
-      margin: 0.5rem 0;
-      transition: background 0.2s;
+      margin: 0.4rem 0;
+      transition: all 0.3s;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      position: relative;
+      overflow: hidden;
     }
-    button:hover { background: #c73650; }
-    button:disabled { background: #555; cursor: not-allowed; }
-    button.secondary { background: #0f3460; }
-    button.secondary:hover { background: #1a4a8a; }
+
+    button::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+      transition: left 0.5s;
+    }
+
+    button:hover::after { left: 100%; }
+    button:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(76, 175, 80, 0.3); }
+    button:active { transform: translateY(0); }
+    button:disabled { background: #333; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    button.secondary {
+      background: linear-gradient(135deg, #1B5E20, #2E7D32);
+      font-size: 0.95rem;
+    }
+
+    #beatBtn:not(:disabled) {
+      background: linear-gradient(135deg, #E65100, #FF6D00, #FF9100);
+      animation: beatPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes beatPulse {
+      0%, 100% { box-shadow: 0 0 10px rgba(255, 109, 0, 0.3); }
+      50% { box-shadow: 0 0 25px rgba(255, 109, 0, 0.6); }
+    }
+
     input {
       width: 100%;
       padding: 0.8rem;
       border-radius: 8px;
-      border: 1px solid #0f3460;
-      background: #1a1a2e;
+      border: 1px solid rgba(76, 175, 80, 0.3);
+      background: rgba(10, 20, 10, 0.8);
       color: #e0e0e0;
       font-size: 1rem;
       margin: 0.5rem 0;
+      transition: border-color 0.3s;
     }
-    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+
+    input:focus { outline: none; border-color: #4CAF50; }
+
+    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 0.5rem 0; }
+
     .stat-box {
-      background: #0f3460;
+      background: rgba(30, 60, 30, 0.6);
       border-radius: 12px;
       padding: 1rem;
       text-align: center;
+      border: 1px solid rgba(76, 175, 80, 0.15);
     }
-    .stat-box .label { font-size: 0.8rem; color: #aaa; }
-    .stat-box .value { font-size: 1.8rem; font-weight: bold; color: #e94560; }
-    .status { margin: 1rem 0; padding: 0.8rem; border-radius: 8px; text-align: center; font-size: 0.9rem; }
-    .status.success { background: #1b4332; color: #95d5b2; }
-    .status.error { background: #3d0000; color: #ff6b6b; }
-    .status.info { background: #1a1a4e; color: #a0a0ff; }
+
+    .stat-box .label { font-size: 0.75rem; color: #6a9a6a; text-transform: uppercase; letter-spacing: 1px; }
+
+    .stat-box .value {
+      font-family: 'Righteous', cursive;
+      font-size: 2rem;
+      font-weight: bold;
+      color: #4CAF50;
+      transition: transform 0.3s;
+    }
+
+    .stat-box .value.pop { animation: popNumber 0.4s ease-out; }
+
+    @keyframes popNumber {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.3); color: #FF9100; }
+      100% { transform: scale(1); }
+    }
+
+    .status { margin: 0.75rem 0; padding: 0.8rem; border-radius: 10px; text-align: center; font-size: 0.9rem; }
+    .status.success { background: rgba(27, 67, 50, 0.8); color: #81C784; border: 1px solid rgba(76, 175, 80, 0.3); }
+    .status.error { background: rgba(61, 0, 0, 0.8); color: #ff6b6b; border: 1px solid rgba(255, 107, 107, 0.3); }
+    .status.info { background: rgba(26, 26, 78, 0.8); color: #a0a0ff; border: 1px solid rgba(160, 160, 255, 0.2); }
+
     .alpha-banner {
-      background: linear-gradient(135deg, #e94560, #0f3460);
+      background: linear-gradient(135deg, rgba(230, 81, 0, 0.8), rgba(46, 125, 50, 0.8));
       border-radius: 12px;
       padding: 1rem;
       text-align: center;
-      margin: 1rem 0;
+      margin: 0.75rem 0;
+      font-weight: 600;
+      border: 1px solid rgba(255, 152, 0, 0.3);
     }
-    .builder-code { font-size: 0.75rem; color: #666; margin-top: 2rem; }
-    a { color: #e94560; }
+
+    .alpha-banner .crown { font-size: 1.2rem; }
+
+    .builder-code {
+      font-size: 0.7rem;
+      color: rgba(106, 154, 106, 0.5);
+      margin-top: 2rem;
+      text-align: center;
+    }
+
+    a { color: #4CAF50; }
+
+    /* Vine decorations */
+    .vine-left, .vine-right {
+      position: fixed;
+      top: 0;
+      width: 60px;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .vine-left {
+      left: 0;
+      background: linear-gradient(to right, rgba(34, 100, 34, 0.1), transparent);
+    }
+
+    .vine-right {
+      right: 0;
+      background: linear-gradient(to left, rgba(34, 100, 34, 0.1), transparent);
+    }
+
+    /* Floating leaves */
+    .leaf {
+      position: fixed;
+      font-size: 1.2rem;
+      opacity: 0.15;
+      pointer-events: none;
+      z-index: -1;
+      animation: leafFloat linear infinite;
+    }
+
+    @keyframes leafFloat {
+      0% { transform: translateY(-20px) rotate(0deg); opacity: 0; }
+      10% { opacity: 0.15; }
+      90% { opacity: 0.15; }
+      100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+    }
+
+    /* Beat counter badge */
+    .beat-flash {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: 'Righteous', cursive;
+      font-size: 5rem;
+      color: #FF9100;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 200;
+      text-shadow: 0 0 40px rgba(255, 145, 0, 0.5);
+    }
+
+    .beat-flash.show {
+      animation: flashNumber 1s ease-out forwards;
+    }
+
+    @keyframes flashNumber {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+      20% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+      100% { opacity: 0; transform: translate(-50%, -60%) scale(1.5); }
+    }
   </style>
 </head>
 <body>
-  <div class="gorilla-emoji">&#x1F98D;</div>
+  <canvas id="particles"></canvas>
+  <div class="vine-left"></div>
+  <div class="vine-right"></div>
+
+  <div class="gorilla-container">
+    <span class="gorilla" id="gorilla">&#x1F98D;</span>
+    <div class="impact-ring" id="ring1"></div>
+    <div class="impact-ring" id="ring2"></div>
+    <div class="impact-ring" id="ring3"></div>
+  </div>
+
   <h1>Gorilla Counter</h1>
-  <p>Beat your chest on Base!</p>
+  <p class="subtitle">Beat your chest on Base!</p>
 
   <div class="card">
     <div id="wallet-section">
-      <button id="connectBtn" onclick="connectWallet()">Connect Wallet</button>
-      <p id="walletAddr" style="font-size:0.8rem; margin-top:0.5rem; word-break:break-all;"></p>
+      <button id="connectBtn" onclick="connectWallet()">&#x1F517; Connect Wallet</button>
+      <p id="walletAddr" style="font-size:0.75rem; margin-top:0.5rem; word-break:break-all; color:#6a9a6a;"></p>
     </div>
   </div>
 
@@ -101,24 +365,153 @@
       </div>
     </div>
     <div class="alpha-banner" id="alphaBanner" style="display:none;">
-      <strong>Alpha Gorilla:</strong> <span id="alphaAddr"></span>
+      <span class="crown">&#x1F451;</span> <strong>Alpha Gorilla:</strong> <span id="alphaAddr"></span>
       <br><span id="alphaBeatsCount"></span> beats
     </div>
   </div>
 
   <div class="card">
-    <button id="beatBtn" onclick="beatChest()" disabled>Beat Chest!</button>
+    <button id="beatBtn" onclick="beatChest()" disabled>&#x1F4A5; Beat Chest!</button>
     <div style="margin-top: 1rem;">
-      <input type="text" id="nameInput" placeholder="Set your gorilla name (max 32 chars)" maxlength="32">
-      <button class="secondary" id="nameBtn" onclick="setName()" disabled>Set Name</button>
+      <input type="text" id="nameInput" placeholder="Enter your gorilla name..." maxlength="32">
+      <button class="secondary" id="nameBtn" onclick="setName()" disabled>&#x1F3F7; Set Name</button>
     </div>
   </div>
 
   <div id="statusMsg"></div>
+  <div class="beat-flash" id="beatFlash"></div>
 
-  <p class="builder-code">Builder Code: bc_5jexnr1x | ERC-8021 Attribution</p>
+  <p class="builder-code">Builder Code: bc_5jexnr1x | ERC-8021 Attribution | Built on Base</p>
+
+  <!-- Floating leaves -->
+  <script>
+    for (let i = 0; i < 8; i++) {
+      const leaf = document.createElement('div');
+      leaf.className = 'leaf';
+      leaf.textContent = ['&#127811;', '&#127812;', '&#127793;'][Math.floor(Math.random() * 3)];
+      leaf.innerHTML = ['&#127811;', '&#127812;', '&#127793;'][Math.floor(Math.random() * 3)];
+      leaf.style.left = Math.random() * 100 + '%';
+      leaf.style.animationDuration = (12 + Math.random() * 18) + 's';
+      leaf.style.animationDelay = (Math.random() * 15) + 's';
+      document.body.appendChild(leaf);
+    }
+  </script>
 
   <script>
+    // ==== PARTICLE SYSTEM ====
+    const canvas = document.getElementById('particles');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    class Particle {
+      constructor(x, y, type) {
+        this.x = x;
+        this.y = y;
+        this.type = type;
+        this.vx = (Math.random() - 0.5) * 12;
+        this.vy = (Math.random() - 0.5) * 12 - 4;
+        this.life = 1;
+        this.decay = 0.015 + Math.random() * 0.015;
+        this.size = 4 + Math.random() * 8;
+        this.gravity = 0.15;
+        this.rotation = Math.random() * Math.PI * 2;
+        this.rotSpeed = (Math.random() - 0.5) * 0.2;
+      }
+
+      update() {
+        this.x += this.vx;
+        this.vy += this.gravity;
+        this.y += this.vy;
+        this.vx *= 0.98;
+        this.life -= this.decay;
+        this.rotation += this.rotSpeed;
+      }
+
+      draw() {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.rotation);
+        ctx.globalAlpha = this.life;
+
+        if (this.type === 'banana') {
+          ctx.font = this.size * 2 + 'px serif';
+          ctx.fillText('\u{1F34C}', -this.size, this.size / 2);
+        } else if (this.type === 'star') {
+          ctx.fillStyle = '#FF9100';
+          ctx.beginPath();
+          for (let i = 0; i < 5; i++) {
+            const angle = (i * 4 * Math.PI) / 5 - Math.PI / 2;
+            const method = i === 0 ? 'moveTo' : 'lineTo';
+            ctx[method](Math.cos(angle) * this.size, Math.sin(angle) * this.size);
+          }
+          ctx.fill();
+        } else {
+          ctx.fillStyle = this.type === 'green' ? '#4CAF50' : '#FF6D00';
+          ctx.fillRect(-this.size / 2, -this.size / 2, this.size, this.size);
+        }
+
+        ctx.restore();
+      }
+    }
+
+    function spawnBeatParticles() {
+      const cx = window.innerWidth / 2;
+      const cy = window.innerHeight * 0.15;
+      for (let i = 0; i < 25; i++) {
+        const types = ['banana', 'star', 'green', 'orange'];
+        particles.push(new Particle(cx, cy, types[Math.floor(Math.random() * types.length)]));
+      }
+    }
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles = particles.filter(p => p.life > 0);
+      particles.forEach(p => { p.update(); p.draw(); });
+      requestAnimationFrame(animateParticles);
+    }
+    animateParticles();
+
+    // ==== BEAT ANIMATION ====
+    function triggerBeatAnimation() {
+      // Gorilla animation
+      const gorilla = document.getElementById('gorilla');
+      gorilla.classList.remove('beating');
+      void gorilla.offsetWidth;
+      gorilla.classList.add('beating');
+
+      // Impact rings
+      [1, 2, 3].forEach((n, i) => {
+        const ring = document.getElementById('ring' + n);
+        setTimeout(() => {
+          ring.classList.remove('active');
+          void ring.offsetWidth;
+          ring.classList.add('active');
+        }, i * 150);
+      });
+
+      // Screen shake
+      document.body.classList.remove('shake');
+      void document.body.offsetWidth;
+      document.body.classList.add('shake');
+
+      // Particles
+      spawnBeatParticles();
+
+      // Number pop
+      document.querySelectorAll('.stat-box .value').forEach(el => {
+        el.classList.remove('pop');
+        void el.offsetWidth;
+        el.classList.add('pop');
+      });
+    }
+
     // ==== CONFIGURATION ====
     const CONTRACT_ADDRESS = '0x90fc6B668293Bc2d9Ce78eC6E1c2d0d2c00EE668';
 
@@ -128,17 +521,6 @@
 
     // ERC-8021 dataSuffix for builder code: bc_5jexnr1x
     const DATA_SUFFIX = '0x0b62635f356a65786e7231780080218021802180218021802180218021';
-
-    // Contract ABI (only the functions we use)
-    const ABI = {
-      chestBeats: { name: 'chestBeats', type: 'function', inputs: [], outputs: [{ type: 'uint256' }], stateMutability: 'view' },
-      gorillaBeats: { name: 'gorillaBeats', type: 'function', inputs: [{ type: 'address' }], outputs: [{ type: 'uint256' }], stateMutability: 'view' },
-      alphaGorilla: { name: 'alphaGorilla', type: 'function', inputs: [], outputs: [{ type: 'address' }], stateMutability: 'view' },
-      alphaBeats: { name: 'alphaBeats', type: 'function', inputs: [], outputs: [{ type: 'uint256' }], stateMutability: 'view' },
-      beatChest: { name: 'beatChest', type: 'function', inputs: [], outputs: [], stateMutability: 'nonpayable' },
-      setGorillaName: { name: 'setGorillaName', type: 'function', inputs: [{ type: 'string' }], outputs: [], stateMutability: 'nonpayable' },
-      gorillaNames: { name: 'gorillaNames', type: 'function', inputs: [{ type: 'address' }], outputs: [{ type: 'string' }], stateMutability: 'view' },
-    };
 
     // Function selectors (first 4 bytes of keccak256)
     const SELECTORS = {
@@ -207,7 +589,7 @@
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         userAddress = accounts[0];
         document.getElementById('walletAddr').textContent = userAddress;
-        document.getElementById('connectBtn').textContent = 'Connected';
+        document.getElementById('connectBtn').innerHTML = '&#x2705; Connected';
         document.getElementById('connectBtn').disabled = true;
         document.getElementById('beatBtn').disabled = false;
         document.getElementById('nameBtn').disabled = false;
@@ -270,7 +652,6 @@
 
     // ==== WRITE TRANSACTIONS (with ERC-8021 attribution) ====
     function appendSuffix(calldata) {
-      // Append ERC-8021 dataSuffix for builder code attribution
       return calldata + DATA_SUFFIX.slice(2);
     }
 
@@ -278,6 +659,8 @@
       if (!userAddress) return;
       try {
         showStatus('Sending chest beat transaction...', 'info');
+        triggerBeatAnimation();
+
         const txData = appendSuffix(SELECTORS.beatChest);
         const txHash = await window.ethereum.request({
           method: 'eth_sendTransaction',
@@ -287,6 +670,15 @@
             data: txData,
           }],
         });
+
+        // Flash the new beat count
+        const flash = document.getElementById('beatFlash');
+        const current = parseInt(document.getElementById('totalBeats').textContent) || 0;
+        flash.textContent = current + 1;
+        flash.classList.remove('show');
+        void flash.offsetWidth;
+        flash.classList.add('show');
+
         showStatus(`Chest beaten! TX: <a href="https://basescan.org/tx/${txHash}" target="_blank">${txHash.slice(0, 10)}...</a>`, 'success');
         setTimeout(refreshStats, 3000);
       } catch (err) {
