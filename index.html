@@ -305,6 +305,20 @@
 
     button.secondary { background: linear-gradient(135deg, var(--green-darker), var(--green-dark)); font-size: 0.9rem; }
 
+    .disconnect-btn {
+      background: transparent;
+      border: 1px solid rgba(255, 100, 100, 0.3);
+      color: #ff6b6b;
+      font-size: 0.75rem;
+      padding: 0.4rem 0.8rem;
+      margin-top: 0.4rem;
+      text-transform: none;
+      letter-spacing: 0;
+      font-weight: 500;
+    }
+    .disconnect-btn:hover { background: rgba(255, 100, 100, 0.1); box-shadow: none; transform: none; }
+    .disconnect-btn::after { display: none; }
+
     #beatBtn:not(:disabled) {
       background: linear-gradient(135deg, var(--orange-dark), var(--orange-primary), var(--orange-light));
       animation: beatPulse 2s ease-in-out infinite;
@@ -537,7 +551,10 @@
     <!-- CONNECT -->
     <div class="card">
       <button id="connectBtn" onclick="connectWallet()">&#x1F517; Connect Wallet</button>
-      <p id="walletAddr" style="font-size:0.7rem; margin-top:0.4rem; word-break:break-all; color:var(--text-muted); text-align:center;"></p>
+      <div id="walletInfo" style="display:none;">
+        <p id="walletAddr" style="font-size:0.7rem; margin-top:0.4rem; word-break:break-all; color:var(--text-muted); text-align:center;"></p>
+        <button class="disconnect-btn" onclick="disconnectWallet()">Disconnect</button>
+      </div>
     </div>
 
     <!-- STATS -->
@@ -612,7 +629,6 @@
         <a href="https://basescan.org/address/0x90fc6B668293Bc2d9Ce78eC6E1c2d0d2c00EE668" target="_blank">Basescan</a>
         <a href="https://github.com/gorillachimps/gorilla-counter" target="_blank">GitHub</a>
         <a href="https://base.dev" target="_blank">Base.dev</a>
-        <a href="https://base.org" target="_blank">Base</a>
       </div>
       <div class="footer-meta">
         Builder Code: bc_5jexnr1x &middot; ERC-8021 Attribution &middot; Built on Base
@@ -779,6 +795,8 @@
         document.getElementById('walletAddr').textContent = userAddress;
         document.getElementById('connectBtn').innerHTML = '&#x2705; Connected';
         document.getElementById('connectBtn').disabled = true;
+        document.getElementById('connectBtn').style.display = 'none';
+        document.getElementById('walletInfo').style.display = 'block';
         document.getElementById('beatBtn').disabled = false;
         document.getElementById('nameBtn').disabled = false;
 
@@ -793,6 +811,20 @@
         showStatus('Wallet connected to Base Mainnet', 'success');
         refreshStats();
       } catch (err) { showStatus('Connection failed: ' + err.message, 'error'); }
+    }
+
+    function disconnectWallet() {
+      userAddress = null;
+      document.getElementById('walletAddr').textContent = '';
+      document.getElementById('walletInfo').style.display = 'none';
+      document.getElementById('connectBtn').style.display = '';
+      document.getElementById('connectBtn').innerHTML = '&#x1F517; Connect Wallet';
+      document.getElementById('connectBtn').disabled = false;
+      document.getElementById('beatBtn').disabled = true;
+      document.getElementById('nameBtn').disabled = true;
+      document.getElementById('yourBeats').textContent = '-';
+      document.getElementById('statusMsg').innerHTML = '';
+      showStatus('Wallet disconnected', 'info');
     }
 
     // ==== LEADERBOARD ====
