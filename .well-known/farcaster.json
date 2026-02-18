@@ -1,0 +1,16 @@
+{
+  "accountAssociation": {
+    "header": "REPLACE_WITH_HEADER_FROM_WARPCAST",
+    "payload": "REPLACE_WITH_PAYLOAD_FROM_WARPCAST",
+    "signature": "REPLACE_WITH_SIGNATURE_FROM_WARPCAST"
+  },
+  "miniapp": {
+    "version": "1",
+    "name": "Gorilla Counter",
+    "iconUrl": "https://gorilla-counter.vercel.app/icon.png",
+    "homeUrl": "https://gorilla-counter.vercel.app/",
+    "splashImageUrl": "https://gorilla-counter.vercel.app/icon.png",
+    "splashBackgroundColor": "#0a0f0a",
+    "requiredChains": ["eip155:8453"]
+  }
+}

@@ -9,18 +9,16 @@
   <meta property="og:title" content="Gorilla Counter - Beat Your Chest on Base">
   <meta property="og:description" content="The onchain gorilla chest-beating competition. Beat your chest, climb the leaderboard, become the Alpha Gorilla.">
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://gorillachimps.github.io/gorilla-counter/">
+  <meta property="og:url" content="https://gorilla-counter.vercel.app/">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Gorilla Counter - Beat Your Chest on Base">
   <meta name="twitter:description" content="The onchain gorilla chest-beating competition on Base.">
   <meta name="description" content="Beat your chest onchain. Compete to become the Alpha Gorilla on Base. Powered by ERC-8021.">
 
-  <!-- Farcaster Frame -->
-  <meta property="fc:frame" content="vNext">
-  <meta property="fc:frame:image" content="https://gorillachimps.github.io/gorilla-counter/og-image.png">
-  <meta property="fc:frame:button:1" content="Beat Your Chest!">
-  <meta property="fc:frame:button:1:action" content="link">
-  <meta property="fc:frame:button:1:target" content="https://gorillachimps.github.io/gorilla-counter/">
+  <!-- Farcaster Mini App embed -->
+  <meta name="fc:miniapp" content='{"version":"1","imageUrl":"https://gorilla-counter.vercel.app/og-image.png","button":{"title":"🦍 Beat Your Chest!","action":{"type":"launch_miniapp","name":"Gorilla Counter","url":"https://gorilla-counter.vercel.app/","splashImageUrl":"https://gorilla-counter.vercel.app/icon.png","splashBackgroundColor":"#0a0f0a"}}}'>
+  <!-- Legacy fc:frame for older clients -->
+  <meta name="fc:frame" content='{"version":"1","imageUrl":"https://gorilla-counter.vercel.app/og-image.png","button":{"title":"🦍 Beat Your Chest!","action":{"type":"launch_frame","name":"Gorilla Counter","url":"https://gorilla-counter.vercel.app/","splashImageUrl":"https://gorilla-counter.vercel.app/icon.png","splashBackgroundColor":"#0a0f0a"}}}'>
 
   <!-- Favicon -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x1F98D;</text></svg>">
@@ -198,6 +196,7 @@
       <a href="https://basescan.org/address/0x90fc6B668293Bc2d9Ce78eC6E1c2d0d2c00EE668" target="_blank" class="nav-link">Contract</a>
       <a href="https://github.com/gorillachimps/gorilla-counter" target="_blank" class="nav-link">GitHub</a>
       <button class="sound-toggle" id="soundToggle" onclick="toggleSound()" title="Toggle sound">&#x1F50A;</button>
+      <div id="fcUserBadge" style="display:none;align-items:center;font-size:0.75rem;font-weight:600;color:var(--green-light);padding:0.3rem 0.6rem;background:rgba(76,175,80,0.1);border:1px solid rgba(76,175,80,0.2);border-radius:20px;gap:4px;"></div>
       <div class="network-badge"><div class="network-dot"></div>Base Mainnet</div>
     </div>
   </nav>
@@ -294,6 +293,41 @@
   </div>
 
   <div class="beat-flash" id="beatFlash"></div>
+
+  <!-- Farcaster Mini App SDK -->
+  <script type="module">
+    import { sdk } from 'https://esm.sh/@farcaster/miniapp-sdk';
+    window.__farcasterSdk = sdk;
+
+    // Expose context + provider globally after SDK resolves
+    window.__fcReady = (async () => {
+      const context = await sdk.context;
+      window.__fcContext = context;
+
+      // Use SDK provider inside Farcaster, fall back to window.ethereum elsewhere
+      try {
+        const provider = await sdk.wallet.getEthereumProvider();
+        window.__ethProvider = provider;
+      } catch {
+        window.__ethProvider = window.ethereum || null;
+      }
+
+      // Show Farcaster user badge if we have a user
+      if (context?.user?.fid) {
+        const u = context.user;
+        const badge = document.getElementById('fcUserBadge');
+        if (badge) {
+          badge.innerHTML = u.pfpUrl
+            ? `<img src="${u.pfpUrl}" style="width:22px;height:22px;border-radius:50%;vertical-align:middle;margin-right:4px;">${u.displayName || u.username || 'Gorilla'}`
+            : `🦍 ${u.displayName || u.username || 'Gorilla'}`;
+          badge.style.display = 'flex';
+        }
+      }
+
+      // Signal to Farcaster that the app is ready (hides splash screen)
+      await sdk.actions.ready();
+    })();
+  </script>
 
   <script>
     for (let i = 0; i < 6; i++) {
@@ -631,19 +665,28 @@
       container.innerHTML = html;
     }
 
+    // ==== PROVIDER ABSTRACTION ====
+    // Returns the EIP-1193 provider — SDK's inside Farcaster, window.ethereum on web
+    async function getProvider() {
+      // Wait for SDK init if available
+      if (window.__fcReady) await window.__fcReady;
+      return window.__ethProvider || window.ethereum || null;
+    }
+
     // ==== WALLET ====
     async function connectWallet() {
-      if (!window.ethereum) { showStatus('No wallet detected. Install MetaMask or Coinbase Wallet.', 'error'); return; }
+      const provider = await getProvider();
+      if (!provider) { showStatus('No wallet detected. Open in Warpcast or install MetaMask.', 'error'); return; }
       try {
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const accounts = await provider.request({ method: 'eth_requestAccounts' });
         userAddress = accounts[0];
         document.getElementById('walletAddr').textContent = userAddress;
         document.getElementById('connectBtn').style.display = 'none';
         document.getElementById('walletInfo').style.display = 'block';
         document.getElementById('beatBtn').disabled = false;
         document.getElementById('nameBtn').disabled = false;
-        try { await window.ethereum.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: BASE_CHAIN_ID }] });
-        } catch(e) { if(e.code===4902) await window.ethereum.request({ method:'wallet_addEthereumChain', params:[{chainId:BASE_CHAIN_ID,chainName:'Base',nativeCurrency:{name:'ETH',symbol:'ETH',decimals:18},rpcUrls:[BASE_RPC],blockExplorerUrls:['https://basescan.org']}]}); }
+        try { await provider.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: BASE_CHAIN_ID }] });
+        } catch(e) { if(e.code===4902) await provider.request({ method:'wallet_addEthereumChain', params:[{chainId:BASE_CHAIN_ID,chainName:'Base',nativeCurrency:{name:'ETH',symbol:'ETH',decimals:18},rpcUrls:[BASE_RPC],blockExplorerUrls:['https://basescan.org']}]}); }
         showStatus('Wallet connected to Base Mainnet', 'success');
         updateStreakUI();
         refreshStats();
@@ -693,10 +736,11 @@
     // ==== TRANSACTIONS ====
     async function beatChest() {
       if (!userAddress) return;
+      const provider = await getProvider();
       try {
         showStatus('Sending chest beat transaction...', 'info');
         triggerBeatAnimation();
-        const txHash = await window.ethereum.request({ method:'eth_sendTransaction', params:[{from:userAddress,to:CONTRACT_ADDRESS,data:appendSuffix(SELECTORS.beatChest)}] });
+        const txHash = await provider.request({ method:'eth_sendTransaction', params:[{from:userAddress,to:CONTRACT_ADDRESS,data:appendSuffix(SELECTORS.beatChest)}] });
         const flash = document.getElementById('beatFlash');
         flash.textContent = (parseInt(document.getElementById('totalBeats').textContent)||0)+1;
         flash.classList.remove('show'); void flash.offsetWidth; flash.classList.add('show');
@@ -708,17 +752,27 @@
 
     async function setName() {
       if (!userAddress) return;
+      const provider = await getProvider();
       const name = document.getElementById('nameInput').value.trim();
       if (!name || name.length > 32) { showStatus('Name must be 1-32 characters', 'error'); return; }
       try {
         showStatus('Setting gorilla name...', 'info');
-        const txHash = await window.ethereum.request({ method:'eth_sendTransaction', params:[{from:userAddress,to:CONTRACT_ADDRESS,data:appendSuffix(SELECTORS.setGorillaName + encodeString(name))}] });
+        const txHash = await provider.request({ method:'eth_sendTransaction', params:[{from:userAddress,to:CONTRACT_ADDRESS,data:appendSuffix(SELECTORS.setGorillaName + encodeString(name))}] });
         showStatus(`Name set! <a href="https://basescan.org/tx/${txHash}" target="_blank">View TX \u{2197}</a>`, 'success');
         setTimeout(refreshStats, 3000);
       } catch(err) { showStatus('Transaction failed: ' + err.message, 'error'); }
     }
 
     // ==== INIT ====
+    // If inside Farcaster, auto-connect once SDK provider is ready
+    (async () => {
+      if (window.__fcReady) {
+        await window.__fcReady;
+        if (window.__ethProvider && window.__fcContext?.user?.fid) {
+          await connectWallet();
+        }
+      }
+    })();
     refreshStats();
     indexGorillas();
     setInterval(refreshStats, 15000);
