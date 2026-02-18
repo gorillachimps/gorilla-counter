@@ -304,31 +304,39 @@
 
     // Expose context + provider globally after SDK resolves
     window.__fcReady = (async () => {
-      const context = await sdk.context;
-      window.__fcContext = context;
-
-      // Use SDK provider inside Farcaster, fall back to window.ethereum elsewhere
       try {
-        const provider = await sdk.wallet.getEthereumProvider();
-        window.__ethProvider = provider;
-      } catch {
+        const context = await sdk.context;
+        window.__fcContext = context;
+
+        // Show Farcaster user badge if we have a user
+        if (context?.user?.fid) {
+          const u = context.user;
+          const badge = document.getElementById('fcUserBadge');
+          if (badge) {
+            badge.innerHTML = u.pfpUrl
+              ? `<img src="${u.pfpUrl}" style="width:22px;height:22px;border-radius:50%;vertical-align:middle;margin-right:4px;">${u.displayName || u.username || 'Gorilla'}`
+              : `🦍 ${u.displayName || u.username || 'Gorilla'}`;
+            badge.style.display = 'flex';
+          }
+
+          // Only grab provider if we actually have a Farcaster user
+          try {
+            const provider = await sdk.wallet.getEthereumProvider();
+            window.__ethProvider = provider;
+          } catch {
+            window.__ethProvider = window.ethereum || null;
+          }
+        } else {
+          // Not inside Farcaster — use window.ethereum
+          window.__ethProvider = window.ethereum || null;
+        }
+      } catch(e) {
+        // SDK not available (plain browser) — use window.ethereum
         window.__ethProvider = window.ethereum || null;
       }
 
-      // Show Farcaster user badge if we have a user
-      if (context?.user?.fid) {
-        const u = context.user;
-        const badge = document.getElementById('fcUserBadge');
-        if (badge) {
-          badge.innerHTML = u.pfpUrl
-            ? `<img src="${u.pfpUrl}" style="width:22px;height:22px;border-radius:50%;vertical-align:middle;margin-right:4px;">${u.displayName || u.username || 'Gorilla'}`
-            : `🦍 ${u.displayName || u.username || 'Gorilla'}`;
-          badge.style.display = 'flex';
-        }
-      }
-
       // Signal to Farcaster that the app is ready (hides splash screen)
-      await sdk.actions.ready();
+      try { await sdk.actions.ready(); } catch {}
     })();
   </script>
 
@@ -727,7 +735,8 @@
         const alpha = await ethCall(SELECTORS.alphaGorilla);
         const alphaAddr = decodeAddress(alpha);
         if (alphaAddr !== '0x0000000000000000000000000000000000000000') {
-          const alphaB = await ethCall(SELECTORS.alphaBeats);
+          // Read alpha's beat count from gorillaBeats mapping (not the cached alphaBeats var)
+          const alphaB = await ethCall(SELECTORS.gorillaBeats + encodeAddress(alphaAddr));
           const alphaBasename = await resolveBasename(alphaAddr);
           document.getElementById('alphaBanner').style.display = 'block';
           document.getElementById('alphaAddr').textContent = alphaBasename || (alphaAddr.slice(0,6) + '...' + alphaAddr.slice(-4));
@@ -767,12 +776,12 @@
     }
 
     // ==== INIT ====
-    // If inside Farcaster, auto-connect once SDK provider is ready
+    // If inside Farcaster with a valid provider, auto-connect
     (async () => {
       if (window.__fcReady) {
         await window.__fcReady;
         if (window.__ethProvider && window.__fcContext?.user?.fid) {
-          await connectWallet();
+          try { await connectWallet(); } catch(e) { console.warn('Auto-connect failed:', e); }
         }
       }
     })();
