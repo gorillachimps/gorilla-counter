@@ -10,9 +10,13 @@
   <meta property="og:description" content="The onchain gorilla chest-beating competition. Beat your chest, climb the leaderboard, become the Alpha Gorilla.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://gorilla-counter.vercel.app/">
+  <meta property="og:image" content="https://gorilla-counter.vercel.app/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Gorilla Counter - Beat Your Chest on Base">
   <meta name="twitter:description" content="The onchain gorilla chest-beating competition on Base.">
+  <meta name="twitter:image" content="https://gorilla-counter.vercel.app/og-image.png">
   <meta name="description" content="Beat your chest onchain. Compete to become the Alpha Gorilla on Base. Powered by ERC-8021.">
 
   <!-- Farcaster Mini App embed -->
@@ -198,7 +202,7 @@
     <div class="nav-right">
       <a href="https://basescan.org/address/0x90fc6B668293Bc2d9Ce78eC6E1c2d0d2c00EE668" target="_blank" class="nav-link">Contract</a>
       <a href="https://github.com/gorillachimps/gorilla-counter" target="_blank" class="nav-link">GitHub</a>
-      <button class="sound-toggle" id="soundToggle" onclick="toggleSound()" title="Toggle sound">&#x1F50A;</button>
+      <button class="sound-toggle" id="soundToggle" onclick="toggleSound()" title="Toggle sound" aria-label="Toggle sound">&#x1F50A;</button>
       <div id="fcUserBadge" style="display:none;align-items:center;font-size:0.75rem;font-weight:600;color:var(--green-light);padding:0.3rem 0.6rem;background:rgba(76,175,80,0.1);border:1px solid rgba(76,175,80,0.2);border-radius:20px;gap:4px;"></div>
       <div class="network-badge"><div class="network-dot"></div>Base Mainnet</div>
     </div>
@@ -206,7 +210,7 @@
 
   <div class="main-content">
     <div class="gorilla-container">
-      <span class="gorilla" id="gorilla">&#x1F98D;</span>
+      <span class="gorilla" id="gorilla" role="img" aria-label="Gorilla">&#x1F98D;</span>
       <div class="impact-ring" id="ring1"></div>
       <div class="impact-ring" id="ring2"></div>
       <div class="impact-ring" id="ring3"></div>
