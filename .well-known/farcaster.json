@@ -7,10 +7,19 @@
   "miniapp": {
     "version": "1",
     "name": "Gorilla Counter",
+    "subtitle": "Onchain chest-beating on Base",
+    "description": "Beat your chest onchain, build a daily streak, climb the leaderboard and become the Alpha Gorilla. Every beat is a real transaction on Base.",
+    "tagline": "Beat your chest. Become Alpha.",
+    "primaryCategory": "games",
+    "tags": ["game", "counter", "leaderboard", "base", "gorilla"],
     "iconUrl": "https://gorilla-counter.vercel.app/icon.png",
     "homeUrl": "https://gorilla-counter.vercel.app/",
     "splashImageUrl": "https://gorilla-counter.vercel.app/icon.png",
     "splashBackgroundColor": "#0a0f0a",
+    "heroImageUrl": "https://gorilla-counter.vercel.app/og-image.jpg",
+    "ogTitle": "Gorilla Counter",
+    "ogDescription": "The onchain chest-beating competition on Base.",
+    "ogImageUrl": "https://gorilla-counter.vercel.app/og-image.jpg",
     "requiredChains": ["eip155:8453"]
   }
 }

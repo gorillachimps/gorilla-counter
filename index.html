@@ -10,19 +10,19 @@
   <meta property="og:description" content="The onchain gorilla chest-beating competition. Beat your chest, climb the leaderboard, become the Alpha Gorilla.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://gorilla-counter.vercel.app/">
-  <meta property="og:image" content="https://gorilla-counter.vercel.app/og-image.png">
+  <meta property="og:image" content="https://gorilla-counter.vercel.app/og-image.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Gorilla Counter - Beat Your Chest on Base">
   <meta name="twitter:description" content="The onchain gorilla chest-beating competition on Base.">
-  <meta name="twitter:image" content="https://gorilla-counter.vercel.app/og-image.png">
+  <meta name="twitter:image" content="https://gorilla-counter.vercel.app/og-image.jpg">
   <meta name="description" content="Beat your chest onchain. Compete to become the Alpha Gorilla on Base. Powered by ERC-8021.">
 
   <!-- Farcaster Mini App embed -->
-  <meta name="fc:miniapp" content='{"version":"1","imageUrl":"https://gorilla-counter.vercel.app/og-image.png","button":{"title":"🦍 Beat Your Chest!","action":{"type":"launch_miniapp","name":"Gorilla Counter","url":"https://gorilla-counter.vercel.app/","splashImageUrl":"https://gorilla-counter.vercel.app/icon.png","splashBackgroundColor":"#0a0f0a"}}}'>
+  <meta name="fc:miniapp" content='{"version":"1","imageUrl":"https://gorilla-counter.vercel.app/og-image.jpg","button":{"title":"🦍 Beat Your Chest!","action":{"type":"launch_miniapp","name":"Gorilla Counter","url":"https://gorilla-counter.vercel.app/","splashImageUrl":"https://gorilla-counter.vercel.app/icon.png","splashBackgroundColor":"#0a0f0a"}}}'>
   <!-- Legacy fc:frame for older clients -->
-  <meta name="fc:frame" content='{"version":"1","imageUrl":"https://gorilla-counter.vercel.app/og-image.png","button":{"title":"🦍 Beat Your Chest!","action":{"type":"launch_frame","name":"Gorilla Counter","url":"https://gorilla-counter.vercel.app/","splashImageUrl":"https://gorilla-counter.vercel.app/icon.png","splashBackgroundColor":"#0a0f0a"}}}'>
+  <meta name="fc:frame" content='{"version":"1","imageUrl":"https://gorilla-counter.vercel.app/og-image.jpg","button":{"title":"🦍 Beat Your Chest!","action":{"type":"launch_frame","name":"Gorilla Counter","url":"https://gorilla-counter.vercel.app/","splashImageUrl":"https://gorilla-counter.vercel.app/icon.png","splashBackgroundColor":"#0a0f0a"}}}'>
 
   <!-- Base.dev app verification -->
   <meta name="base:app_id" content="69931a50e0d5d2cf831b5deb">
@@ -260,11 +260,11 @@
       <!-- Share -->
       <div class="share-row">
         <button class="share-btn x-btn" onclick="shareX()">&#x1D54F; Share on X</button>
-        <button class="share-btn fc-btn" onclick="shareFC()">&#x1F7E3; Warpcast</button>
+        <button class="share-btn fc-btn" onclick="shareFC()">&#x1F7E3; Cast It</button>
       </div>
     </div>
 
-    <div id="statusMsg"></div>
+    <div id="statusMsg" aria-live="polite"></div>
 
     <!-- LEADERBOARD -->
     <div class="card">
@@ -317,9 +317,16 @@
           const u = context.user;
           const badge = document.getElementById('fcUserBadge');
           if (badge) {
-            badge.innerHTML = u.pfpUrl
-              ? `<img src="${u.pfpUrl}" style="width:22px;height:22px;border-radius:50%;vertical-align:middle;margin-right:4px;">${u.displayName || u.username || 'Gorilla'}`
-              : `🦍 ${u.displayName || u.username || 'Gorilla'}`;
+            badge.textContent = '';
+            if (u.pfpUrl && /^https:\/\//.test(u.pfpUrl)) {
+              const img = document.createElement('img');
+              img.src = u.pfpUrl;
+              img.style.cssText = 'width:22px;height:22px;border-radius:50%;vertical-align:middle;margin-right:4px;';
+              badge.appendChild(img);
+            } else {
+              badge.appendChild(document.createTextNode('🦍 '));
+            }
+            badge.appendChild(document.createTextNode(u.displayName || u.username || 'Gorilla'));
             badge.style.display = 'flex';
           }
 
@@ -360,10 +367,27 @@
     // ==== CONFIG ====
     const CONTRACT_ADDRESS = '0x90fc6B668293Bc2d9Ce78eC6E1c2d0d2c00EE668';
     const BASE_CHAIN_ID = '0x2105';
-    const BASE_RPC = 'https://mainnet.base.org';
+    const BASE_RPCS = ['https://mainnet.base.org', 'https://base-rpc.publicnode.com', 'https://1rpc.io/base'];
+    let rpcIndex = 0;
+    const APP_URL = 'https://gorilla-counter.vercel.app/';
     const DATA_SUFFIX = '0x0b62635f356a65786e7231780080218021802180218021802180218021';
     const BASENAME_RESOLVER = '0xC6d566A56A1aFf6508b41f6c90ff131615583BCD';
     const CHEST_BEATEN_TOPIC = '0x0237bcb73d68d5b8b14d3e2512dd0a2c422b2177cb90241804e9e5436f50db95';
+
+    // All gorillas known as of this block, so new visitors never scan full history.
+    // Public RPCs cap eth_getLogs at 10,000 blocks per request; we only scan forward from here.
+    const INDEX_SEED = {
+      block: 48319945, // 2026-07-07
+      addrs: [
+        '0x7584b2caf8070852f7887ee10d86f981dc128eec',
+        '0x549063dd3380440e2c92c9709a49b616237c0e28',
+        '0x8a03f8237fa235bf149613e5697a3273b0b8a3ac',
+        '0x9a25025f722305b4336ccd7e67995e691a12426e',
+        '0x6bd7a2443bcf663a7fcbe1b36f219797ad63e96a',
+      ],
+    };
+    const LOGS_WINDOW = 9999;
+    const MAX_WINDOWS_PER_SCAN = 120;
 
     const SELECTORS = {
       chestBeats: '0x29275322', gorillaBeats: '0xd8b7610a', alphaGorilla: '0x71c37d99',
@@ -440,20 +464,26 @@
     }
 
     // ==== SHARE ====
+    function isInFarcaster() { return !!(window.__fcContext && window.__fcContext.user && window.__fcContext.user.fid); }
     function shareX() {
       const beats = document.getElementById('yourBeats').textContent;
       const total = document.getElementById('totalBeats').textContent;
       const text = beats !== '-'
-        ? `I've beaten my chest ${beats} times on Gorilla Counter! Total community beats: ${total}. Can you beat me? \u{1F98D}\u{1F4A5}\n\nhttps://gorillachimps.github.io/gorilla-counter/\n\nBuilt on @base`
-        : `Check out Gorilla Counter - the onchain chest-beating competition on @base! \u{1F98D}\u{1F4A5}\n\nhttps://gorillachimps.github.io/gorilla-counter/`;
-      window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
+        ? `I've beaten my chest ${beats} times on Gorilla Counter! Total community beats: ${total}. Can you beat me? \u{1F98D}\u{1F4A5}\n\n${APP_URL}\n\nBuilt on @base`
+        : `Check out Gorilla Counter - the onchain chest-beating competition on @base! \u{1F98D}\u{1F4A5}\n\n${APP_URL}`;
+      const url = `https://x.com/intent/tweet?text=${encodeURIComponent(text)}`;
+      if (isInFarcaster() && window.__farcasterSdk?.actions?.openUrl) window.__farcasterSdk.actions.openUrl(url);
+      else window.open(url, '_blank');
     }
-    function shareFC() {
+    async function shareFC() {
       const beats = document.getElementById('yourBeats').textContent;
       const text = beats !== '-'
         ? `I've beaten my chest ${beats} times on Gorilla Counter! \u{1F98D}\u{1F4A5} Can you beat me?`
         : `Check out Gorilla Counter - the onchain chest-beating competition! \u{1F98D}`;
-      window.open(`https://warpcast.com/~/compose?text=${encodeURIComponent(text)}&embeds[]=${encodeURIComponent('https://gorillachimps.github.io/gorilla-counter/')}`, '_blank');
+      if (isInFarcaster() && window.__farcasterSdk?.actions?.composeCast) {
+        try { await window.__farcasterSdk.actions.composeCast({ text, embeds: [APP_URL] }); return; } catch {}
+      }
+      window.open(`https://farcaster.xyz/~/compose?text=${encodeURIComponent(text)}&embeds[]=${encodeURIComponent(APP_URL)}`, '_blank');
     }
 
     // ==== PARTICLES ====
@@ -482,19 +512,55 @@
     }
 
     // ==== HELPERS ====
+    function esc(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
     function showStatus(msg, type) { document.getElementById('statusMsg').innerHTML = `<div class="status ${type}">${msg}</div>`; }
     function encodeAddress(addr) { return addr.slice(2).toLowerCase().padStart(64,'0'); }
-    function encodeString(str) { const hex=Array.from(new TextEncoder().encode(str)).map(b=>b.toString(16).padStart(2,'0')).join('');return '0000000000000000000000000000000000000000000000000000000000000020'+str.length.toString(16).padStart(64,'0')+hex.padEnd(Math.ceil(hex.length/64)*64,'0'); }
-    function decodeUint256(hex) { return (!hex||hex==='0x')?0:parseInt(hex,16); }
+    function encodeString(str) {
+      const bytes = new TextEncoder().encode(str);
+      const hex = Array.from(bytes).map(b=>b.toString(16).padStart(2,'0')).join('');
+      return '0000000000000000000000000000000000000000000000000000000000000020'
+        + bytes.length.toString(16).padStart(64,'0')
+        + hex.padEnd(Math.ceil(hex.length/64)*64,'0');
+    }
+    function decodeUint256(hex) { return (!hex||hex==='0x')?0:Number(BigInt(hex)); }
     function decodeAddress(hex) { return '0x'+hex.slice(-40); }
-    function decodeString(hex) { if(!hex||hex==='0x'||hex.length<130) return '';try{const len=parseInt(hex.slice(66,130),16);if(len===0||len>64) return '';const s=hex.slice(130,130+len*2);return s.match(/.{2}/g).map(b=>String.fromCharCode(parseInt(b,16))).join('');}catch{return '';} }
+    function decodeString(hex) {
+      if (!hex || hex === '0x' || hex.length < 130) return '';
+      try {
+        const len = parseInt(hex.slice(66,130),16);
+        if (len === 0 || len > 256) return '';
+        return new TextDecoder().decode(hexToBytes(hex.slice(130, 130 + len*2)));
+      } catch { return ''; }
+    }
     function appendSuffix(d) { return d + DATA_SUFFIX.slice(2); }
 
     async function rpcCall(method, params) {
-      const r = await fetch(BASE_RPC, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({jsonrpc:'2.0',id:1,method,params}) });
-      const j = await r.json(); return j.result || (j.error ? null : '0x0');
+      let lastErr;
+      for (let attempt = 0; attempt < BASE_RPCS.length; attempt++) {
+        const i = (rpcIndex + attempt) % BASE_RPCS.length;
+        try {
+          const r = await fetch(BASE_RPCS[i], { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({jsonrpc:'2.0',id:1,method,params}) });
+          const j = await r.json();
+          if (j.error) throw new Error(j.error.message || 'RPC error');
+          rpcIndex = i;
+          return j.result;
+        } catch (e) { lastErr = e; }
+      }
+      throw lastErr;
     }
     async function ethCall(data) { const r = await rpcCall('eth_call', [{to:CONTRACT_ADDRESS,data},'latest']); return r||'0x0'; }
+
+    async function waitForTx(txHash, timeoutMs = 90000) {
+      const start = Date.now();
+      while (Date.now() - start < timeoutMs) {
+        try {
+          const rec = await rpcCall('eth_getTransactionReceipt', [txHash]);
+          if (rec) return rec.status === '0x1';
+        } catch {}
+        await new Promise(r => setTimeout(r, 2500));
+      }
+      return null; // still pending after timeout
+    }
 
     // ==== BASENAMES RESOLUTION ====
     // Compute keccak256 in JS (minimal implementation for namehash)
@@ -560,44 +626,44 @@
       if (basenameCache.has(addr.toLowerCase())) return basenameCache.get(addr.toLowerCase());
       try {
         const hex = addr.toLowerCase().slice(2);
-        const reverseName = hex + '.addr.reverse';
-        const node = await namehash(reverseName);
-        const nodeHex = bytesToHex(node).slice(2);
-        const data = '0x691f3431' + nodeHex; // name(bytes32)
-        const r = await fetch(BASE_RPC, { method:'POST', headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({jsonrpc:'2.0',id:1,method:'eth_call',params:[{to:BASENAME_RESOLVER,data},'latest']})
-        });
-        const j = await r.json();
-        const name = decodeString(j.result);
+        const node = await namehash(hex + '.addr.reverse');
+        const data = '0x691f3431' + bytesToHex(node).slice(2); // name(bytes32)
+        const result = await rpcCall('eth_call', [{to:BASENAME_RESOLVER,data},'latest']);
+        const name = decodeString(result);
         basenameCache.set(addr.toLowerCase(), name || '');
         return name || '';
       } catch { basenameCache.set(addr.toLowerCase(), ''); return ''; }
     }
 
     // ==== STREAK ====
+    // Days are in the user's local timezone; a streak is only alive if the
+    // last beat was today or yesterday.
+    function localDay(offsetDays = 0) {
+      const d = new Date(Date.now() - offsetDays * 86400000);
+      return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    }
+    function loadStreak() {
+      try { return JSON.parse(localStorage.getItem('gorilla_streak_' + userAddress.toLowerCase()) || '{"days":[],"streak":0}'); }
+      catch { return { days: [], streak: 0 }; }
+    }
     function getStreak() {
       if (!userAddress) return 0;
-      const key = 'gorilla_streak_' + userAddress.toLowerCase();
-      const data = JSON.parse(localStorage.getItem(key) || '{"days":[],"streak":0}');
+      const data = loadStreak();
+      const last = data.days[data.days.length - 1];
+      if (last !== localDay() && last !== localDay(1)) return 0;
       return data.streak || 0;
     }
     function recordBeat() {
       if (!userAddress) return;
       const key = 'gorilla_streak_' + userAddress.toLowerCase();
-      const data = JSON.parse(localStorage.getItem(key) || '{"days":[],"streak":0}');
-      const today = new Date().toISOString().slice(0, 10);
-      const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+      const data = loadStreak();
+      const today = localDay();
       if (!data.days.includes(today)) {
+        data.streak = data.days.includes(localDay(1)) ? (data.streak || 0) + 1 : 1;
         data.days.push(today);
-        if (data.days.includes(yesterday)) {
-          data.streak = (data.streak || 0) + 1;
-        } else {
-          data.streak = 1;
-        }
-        // Keep only last 60 days
-        const cutoff = new Date(Date.now() - 60 * 86400000).toISOString().slice(0, 10);
+        const cutoff = localDay(60);
         data.days = data.days.filter(d => d >= cutoff);
-        localStorage.setItem(key, JSON.stringify(data));
+        try { localStorage.setItem(key, JSON.stringify(data)); } catch {}
       }
       updateStreakUI();
     }
@@ -620,40 +686,77 @@
     }
 
     // ==== EVENT LOG INDEXING ====
-    async function indexGorillas() {
+    // Seeded + incremental: we ship the known gorilla set as of INDEX_SEED.block,
+    // cache progress in localStorage, and only eth_getLogs-scan the blocks minted
+    // since (in <=10k windows — public RPCs reject larger ranges).
+    let indexing = false;
+    function loadIndexCache() {
       try {
-        // Get logs for ChestBeaten events
-        const logs = await rpcCall('eth_getLogs', [{ address: CONTRACT_ADDRESS, topics: [CHEST_BEATEN_TOPIC], fromBlock: 'earliest', toBlock: 'latest' }]);
-        if (!logs || !Array.isArray(logs)) return;
-
-        const uniqueAddrs = new Set();
-        logs.forEach(log => {
-          if (log.topics && log.topics[1]) {
-            const addr = '0x' + log.topics[1].slice(26);
-            uniqueAddrs.add(addr.toLowerCase());
-          }
-        });
-
-        document.getElementById('gorillaCount').textContent = uniqueAddrs.size;
-
-        // Fetch beats + names for all unique gorillas (batch in parallel, max 10 at a time)
-        const addrs = Array.from(uniqueAddrs);
-        for (let i = 0; i < addrs.length; i += 10) {
-          const batch = addrs.slice(i, i + 10);
-          await Promise.all(batch.map(async (addr) => {
-            const beatsHex = await ethCall(SELECTORS.gorillaBeats + encodeAddress(addr));
-            const beats = decodeUint256(beatsHex);
-            if (beats > 0) {
-              const nameHex = await ethCall(SELECTORS.gorillaNames + encodeAddress(addr));
-              const name = decodeString(nameHex);
-              const basename = await resolveBasename(addr);
-              knownGorillas.set(addr.toLowerCase(), { beats, name, basename, addr });
-            }
-          }));
+        const c = JSON.parse(localStorage.getItem('gorilla_index_v2') || 'null');
+        if (c && typeof c.block === 'number' && Array.isArray(c.addrs) && c.block >= INDEX_SEED.block) {
+          c.addrs = Array.from(new Set(c.addrs.concat(INDEX_SEED.addrs)));
+          return c;
         }
+      } catch {}
+      return { block: INDEX_SEED.block, addrs: INDEX_SEED.addrs.slice() };
+    }
+    function saveIndexCache(cache) {
+      try { localStorage.setItem('gorilla_index_v2', JSON.stringify(cache)); } catch {}
+    }
+    async function fetchGorilla(addr) {
+      // Self-contained: one flaky RPC read must not sink the whole leaderboard pass
+      try {
+        const beats = decodeUint256(await ethCall(SELECTORS.gorillaBeats + encodeAddress(addr)));
+        if (beats > 0) {
+          const name = decodeString(await ethCall(SELECTORS.gorillaNames + encodeAddress(addr)));
+          const basename = await resolveBasename(addr);
+          knownGorillas.set(addr.toLowerCase(), { beats, name, basename, addr });
+        }
+      } catch (e) { console.warn('fetchGorilla failed for', addr, e); }
+    }
+    async function indexGorillas() {
+      if (indexing) return;
+      indexing = true;
+      try {
+        const cache = loadIndexCache();
+        const known = new Set(cache.addrs.map(a => a.toLowerCase()));
 
+        // 1) Render what we already know before touching eth_getLogs
+        for (let i = 0; i < cache.addrs.length; i += 10) {
+          await Promise.all(cache.addrs.slice(i, i + 10).map(fetchGorilla));
+        }
+        document.getElementById('gorillaCount').textContent = known.size;
         renderLeaderboard();
-      } catch (err) { console.error('Index error:', err); renderLeaderboard(); }
+
+        // 2) Scan forward from the cached block for new gorillas
+        const latest = decodeUint256(await rpcCall('eth_blockNumber', []));
+        let from = cache.block + 1, windows = 0;
+        while (from <= latest && windows < MAX_WINDOWS_PER_SCAN) {
+          const to = Math.min(from + LOGS_WINDOW, latest);
+          const logs = await rpcCall('eth_getLogs', [{ address: CONTRACT_ADDRESS, topics: [CHEST_BEATEN_TOPIC], fromBlock: '0x' + from.toString(16), toBlock: '0x' + to.toString(16) }]);
+          (logs || []).forEach(log => {
+            if (log.topics && log.topics[1]) known.add(('0x' + log.topics[1].slice(26)).toLowerCase());
+          });
+          cache.block = to;
+          from = to + 1;
+          windows++;
+        }
+        cache.addrs = Array.from(known);
+        saveIndexCache(cache);
+
+        // 3) Fetch stats for any newly discovered gorillas
+        const fresh = cache.addrs.filter(a => !knownGorillas.has(a));
+        for (let i = 0; i < fresh.length; i += 10) {
+          await Promise.all(fresh.slice(i, i + 10).map(fetchGorilla));
+        }
+        document.getElementById('gorillaCount').textContent = known.size;
+        renderLeaderboard();
+      } catch (err) {
+        console.error('Index error:', err);
+        if (knownGorillas.size === 0) {
+          document.getElementById('leaderboard').innerHTML = '<div class="leaderboard-empty">Couldn\'t reach the Base RPC — retrying shortly...</div>';
+        } else { renderLeaderboard(); }
+      } finally { indexing = false; }
     }
 
     function renderLeaderboard() {
@@ -670,8 +773,8 @@
       entries.slice(0, 20).forEach((e, i) => {
         const rank = i < 3 ? rankEmoji[i] : (i + 1);
         const rankClass = i < 3 ? `rank-${i + 1}` : '';
-        const display = e.basename ? `<span class="basename">${e.basename}</span>` :
-                         e.name ? e.name :
+        const display = e.basename ? `<span class="basename">${esc(e.basename)}</span>` :
+                         e.name ? esc(e.name) :
                          `<span class="addr-mono">${e.addr.slice(0, 6)}...${e.addr.slice(-4)}</span>`;
         const isYou = userAddress && e.addr.toLowerCase() === userAddress.toLowerCase();
         html += `<tr class="leaderboard-row ${isYou ? 'is-you' : ''}"><td class="${rankClass}">${rank}</td><td>${display}${isYou ? ' (you)' : ''}</td><td>${e.beats}</td></tr>`;
@@ -689,9 +792,40 @@
     }
 
     // ==== WALLET ====
+    async function ensureBaseChain(provider) {
+      let chainId = await provider.request({ method: 'eth_chainId' });
+      if (chainId === BASE_CHAIN_ID) return;
+      try {
+        await provider.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: BASE_CHAIN_ID }] });
+      } catch(e) {
+        if (e.code === 4902) {
+          await provider.request({ method:'wallet_addEthereumChain', params:[{chainId:BASE_CHAIN_ID,chainName:'Base',nativeCurrency:{name:'ETH',symbol:'ETH',decimals:18},rpcUrls:[BASE_RPCS[0]],blockExplorerUrls:['https://basescan.org']}]});
+        }
+      }
+      chainId = await provider.request({ method: 'eth_chainId' });
+      if (chainId !== BASE_CHAIN_ID) throw new Error('Please switch your wallet to Base Mainnet');
+    }
+
+    let listenersAttached = false;
+    function attachWalletListeners(provider) {
+      if (listenersAttached || typeof provider.on !== 'function') return;
+      listenersAttached = true;
+      provider.on('accountsChanged', (accounts) => {
+        if (!accounts || accounts.length === 0) { disconnectWallet(); return; }
+        userAddress = accounts[0];
+        document.getElementById('walletAddr').textContent = userAddress;
+        showToast('Account changed');
+        updateStreakUI(); refreshStats(); renderLeaderboard();
+      });
+      provider.on('chainChanged', (chainId) => {
+        if (chainId !== BASE_CHAIN_ID) showStatus('Wallet left Base Mainnet — switch back to keep beating.', 'error');
+        else document.getElementById('statusMsg').innerHTML = '';
+      });
+    }
+
     async function connectWallet() {
       const provider = await getProvider();
-      if (!provider) { showStatus('No wallet detected. Open in Warpcast or install MetaMask.', 'error'); return; }
+      if (!provider) { showStatus('No wallet detected. Open in a Farcaster app or install MetaMask.', 'error'); return; }
       try {
         const accounts = await provider.request({ method: 'eth_requestAccounts' });
         userAddress = accounts[0];
@@ -700,12 +834,13 @@
         document.getElementById('walletInfo').style.display = 'block';
         document.getElementById('beatBtn').disabled = false;
         document.getElementById('nameBtn').disabled = false;
-        try { await provider.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: BASE_CHAIN_ID }] });
-        } catch(e) { if(e.code===4902) await provider.request({ method:'wallet_addEthereumChain', params:[{chainId:BASE_CHAIN_ID,chainName:'Base',nativeCurrency:{name:'ETH',symbol:'ETH',decimals:18},rpcUrls:[BASE_RPC],blockExplorerUrls:['https://basescan.org']}]}); }
-        showStatus('Wallet connected to Base Mainnet', 'success');
+        attachWalletListeners(provider);
+        try { await ensureBaseChain(provider); showStatus('Wallet connected to Base Mainnet', 'success'); }
+        catch(e) { showStatus(esc(e.message), 'error'); }
         updateStreakUI();
         refreshStats();
-      } catch(err) { showStatus('Connection failed: ' + err.message, 'error'); }
+        renderLeaderboard();
+      } catch(err) { showStatus('Connection failed: ' + esc(err.message), 'error'); }
     }
 
     function disconnectWallet() {
@@ -750,33 +885,66 @@
     }
 
     // ==== TRANSACTIONS ====
+    function isUserRejection(err) { return !!err && (err.code === 4001 || /reject|denied|cancel/i.test(err.message || '')); }
+    async function promptAddMiniApp() {
+      try {
+        if (!isInFarcaster() || localStorage.getItem('gorilla_add_prompted')) return;
+        localStorage.setItem('gorilla_add_prompted', '1');
+        await window.__farcasterSdk.actions.addMiniApp();
+      } catch {}
+    }
+
     async function beatChest() {
       if (!userAddress) return;
       const provider = await getProvider();
+      if (!provider) { showStatus('No wallet detected.', 'error'); return; }
       try {
-        showStatus('Sending chest beat transaction...', 'info');
-        triggerBeatAnimation();
+        await ensureBaseChain(provider);
+        showStatus('Confirm the chest beat in your wallet...', 'info');
         const txHash = await provider.request({ method:'eth_sendTransaction', params:[{from:userAddress,to:CONTRACT_ADDRESS,data:appendSuffix(SELECTORS.beatChest)}] });
+        triggerBeatAnimation();
         const flash = document.getElementById('beatFlash');
         flash.textContent = (parseInt(document.getElementById('totalBeats').textContent)||0)+1;
         flash.classList.remove('show'); void flash.offsetWidth; flash.classList.add('show');
+        showStatus(`Beat sent — confirming... <a href="https://basescan.org/tx/${txHash}" target="_blank">View TX \u{2197}</a>`, 'info');
+        const ok = await waitForTx(txHash);
+        if (ok === false) {
+          showStatus(`Transaction reverted. <a href="https://basescan.org/tx/${txHash}" target="_blank">View TX \u{2197}</a>`, 'error');
+          return;
+        }
         recordBeat();
         showStatus(`Chest beaten! <a href="https://basescan.org/tx/${txHash}" target="_blank">View TX \u{2197}</a>`, 'success');
-        setTimeout(() => { refreshStats(); indexGorillas(); }, 4000);
-      } catch(err) { showStatus('Transaction failed: ' + err.message, 'error'); }
+        refreshStats(); indexGorillas();
+        promptAddMiniApp();
+      } catch(err) {
+        if (isUserRejection(err)) showStatus('Beat cancelled.', 'info');
+        else showStatus('Transaction failed: ' + esc(err.message || err), 'error');
+      }
     }
 
     async function setName() {
       if (!userAddress) return;
       const provider = await getProvider();
+      if (!provider) { showStatus('No wallet detected.', 'error'); return; }
       const name = document.getElementById('nameInput').value.trim();
-      if (!name || name.length > 32) { showStatus('Name must be 1-32 characters', 'error'); return; }
+      // Contract limit is 32 BYTES (emoji are 4 bytes each), not 32 characters
+      if (!name || new TextEncoder().encode(name).length > 32) { showStatus('Name must be 1-32 bytes (emoji count as 4)', 'error'); return; }
       try {
+        await ensureBaseChain(provider);
         showStatus('Setting gorilla name...', 'info');
         const txHash = await provider.request({ method:'eth_sendTransaction', params:[{from:userAddress,to:CONTRACT_ADDRESS,data:appendSuffix(SELECTORS.setGorillaName + encodeString(name))}] });
+        showStatus(`Name sent — confirming... <a href="https://basescan.org/tx/${txHash}" target="_blank">View TX \u{2197}</a>`, 'info');
+        const ok = await waitForTx(txHash);
+        if (ok === false) {
+          showStatus(`Transaction reverted. <a href="https://basescan.org/tx/${txHash}" target="_blank">View TX \u{2197}</a>`, 'error');
+          return;
+        }
         showStatus(`Name set! <a href="https://basescan.org/tx/${txHash}" target="_blank">View TX \u{2197}</a>`, 'success');
-        setTimeout(refreshStats, 3000);
-      } catch(err) { showStatus('Transaction failed: ' + err.message, 'error'); }
+        refreshStats(); indexGorillas();
+      } catch(err) {
+        if (isUserRejection(err)) showStatus('Cancelled.', 'info');
+        else showStatus('Transaction failed: ' + esc(err.message || err), 'error');
+      }
     }
 
     // ==== INIT ====
