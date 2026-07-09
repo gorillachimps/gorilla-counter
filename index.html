@@ -422,7 +422,7 @@
     ];
 
     let userAddress = null;
-    let soundEnabled = true;
+    let soundEnabled = (() => { try { return localStorage.getItem('gorilla_sound') !== 'off'; } catch { return true; } })();
     let knownGorillas = new Map(); // addr -> { beats, name, basename }
     let basenameCache = new Map();
 
@@ -461,8 +461,11 @@
     }
     function toggleSound() {
       soundEnabled = !soundEnabled;
+      try { localStorage.setItem('gorilla_sound', soundEnabled ? 'on' : 'off'); } catch {}
       document.getElementById('soundToggle').textContent = soundEnabled ? '\u{1F50A}' : '\u{1F507}';
     }
+    // Reflect the persisted sound preference on the toggle at load
+    document.getElementById('soundToggle').textContent = soundEnabled ? '\u{1F50A}' : '\u{1F507}';
 
     // ==== TOAST ====
     function showToast(msg) {
