@@ -95,6 +95,9 @@
     button:disabled { background: #2a2a2a; cursor: not-allowed; transform: none; box-shadow: none; }
     button:disabled::after { display: none; }
     button.secondary { background: linear-gradient(135deg, var(--green-darker), var(--green-dark)); font-size: 0.9rem; }
+    button.is-busy { opacity: 0.9; cursor: progress; }
+    .spinner { display: inline-block; width: 0.9em; height: 0.9em; border: 2px solid rgba(255,255,255,0.35); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: -0.12em; margin-right: 0.4em; }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
     .disconnect-btn { background: transparent; border: 1px solid rgba(255,100,100,0.3); color: #ff6b6b; font-size: 0.75rem; padding: 0.4rem 0.8rem; margin-top: 0.4rem; text-transform: none; letter-spacing: 0; font-weight: 500; }
     .disconnect-btn:hover { background: rgba(255,100,100,0.1); box-shadow: none; transform: none; }
@@ -907,6 +910,34 @@
 
     // ==== TRANSACTIONS ====
     function isUserRejection(err) { return !!err && (err.code === 4001 || /reject|denied|cancel/i.test(err.message || '')); }
+    // Lock a button (spinner + label) while a tx is in flight so an excited
+    // user can't fire a second wallet prompt during the 4-90s receipt poll.
+    function setBtnBusy(id, busy, label) {
+      const b = document.getElementById(id);
+      if (!b) return;
+      if (busy) {
+        if (b.dataset.orig === undefined) b.dataset.orig = b.innerHTML;
+        b.disabled = true;
+        b.classList.add('is-busy');
+        b.innerHTML = `<span class="spinner"></span>${label}`;
+      } else {
+        b.classList.remove('is-busy');
+        if (b.dataset.orig !== undefined) { b.innerHTML = b.dataset.orig; delete b.dataset.orig; }
+      }
+    }
+    // Restore both action buttons to reflect connection state after a tx settles
+    function restoreTxButtons() {
+      const connected = !!userAddress;
+      document.getElementById('beatBtn').disabled = !connected;
+      document.getElementById('nameBtn').disabled = !connected;
+    }
+    // Native haptic feedback inside Farcaster/Base App — capability-guarded
+    async function triggerHaptic() {
+      try {
+        const sdk = window.__farcasterSdk;
+        if (isInFarcaster() && sdk?.haptics?.impactOccurred) await sdk.haptics.impactOccurred('heavy');
+      } catch {}
+    }
     async function promptAddMiniApp() {
       try {
         if (!isInFarcaster() || localStorage.getItem('gorilla_add_prompted')) return;
@@ -919,11 +950,14 @@
       if (!userAddress) return;
       const provider = await getProvider();
       if (!provider) { showStatus('No wallet detected.', 'error'); return; }
+      setBtnBusy('beatBtn', true, 'Confirming…');
+      document.getElementById('nameBtn').disabled = true;
       try {
         await ensureBaseChain(provider);
         showStatus('Confirm the chest beat in your wallet...', 'info');
         const txHash = await provider.request({ method:'eth_sendTransaction', params:[{from:userAddress,to:CONTRACT_ADDRESS,data:appendSuffix(SELECTORS.beatChest)}] });
         triggerBeatAnimation();
+        triggerHaptic();
         const flash = document.getElementById('beatFlash');
         flash.textContent = (parseInt(document.getElementById('totalBeats').textContent)||0)+1;
         flash.classList.remove('show'); void flash.offsetWidth; flash.classList.add('show');
@@ -940,6 +974,9 @@
       } catch(err) {
         if (isUserRejection(err)) showStatus('Beat cancelled.', 'info');
         else showStatus('Transaction failed: ' + esc(err.message || err), 'error');
+      } finally {
+        setBtnBusy('beatBtn', false);
+        restoreTxButtons();
       }
     }
 
@@ -950,6 +987,8 @@
       const name = document.getElementById('nameInput').value.trim();
       // Contract limit is 32 BYTES (emoji are 4 bytes each), not 32 characters
       if (!name || new TextEncoder().encode(name).length > 32) { showStatus('Name must be 1-32 bytes (emoji count as 4)', 'error'); return; }
+      setBtnBusy('nameBtn', true, 'Confirming…');
+      document.getElementById('beatBtn').disabled = true;
       try {
         await ensureBaseChain(provider);
         showStatus('Setting gorilla name...', 'info');
@@ -965,6 +1004,9 @@
       } catch(err) {
         if (isUserRejection(err)) showStatus('Cancelled.', 'info');
         else showStatus('Transaction failed: ' + esc(err.message || err), 'error');
+      } finally {
+        setBtnBusy('nameBtn', false);
+        restoreTxButtons();
       }
     }
 
