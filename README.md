@@ -8,7 +8,7 @@ Beat your chest, climb the leaderboard, become the **Alpha Gorilla**.
 
 **Contract:** [`0x90fc6B668293Bc2d9Ce78eC6E1c2d0d2c00EE668`](https://basescan.org/address/0x90fc6B668293Bc2d9Ce78eC6E1c2d0d2c00EE668) (Base Mainnet)
 
-![Gorilla Counter](og-image.png)
+![Gorilla Counter](og-image.jpg)
 
 ## What it is
 
@@ -17,12 +17,16 @@ A single-page dapp where every chest beat is an onchain transaction on Base. The
 ## Features
 
 - **Onchain everything** — every beat is a real transaction on Base mainnet
-- **Live leaderboard** with Basenames resolution
+- **Live leaderboard** — seeded + incremental index of every gorilla, with Basenames resolution and a "Your rank" line showing where you sit and the gap to climb
+- **Gorilla names, done safely** — UTF-8 names up to 32 bytes (emoji count as 4) with a live byte counter, escaped before rendering so on-chain names can't inject markup
+- **Resilient RPC** — rotates across multiple public Base RPC endpoints with automatic fallback
 - **Streak tracking** (local) and milestone badges (1, 10, 50, 100, 500, 1000 beats)
-- **Farcaster Mini App** — runs natively in Warpcast with auto-connect
+- **Farcaster Mini App** — runs natively in Warpcast with auto-connect and haptics
 - **base.dev registered** app
 - **ERC-8021 attribution** wired into every transaction (builder code `bc_5jexnr1x`)
 - **Share to X / Warpcast** with one click
+- **Polished UX** — double-beat guard, loading skeletons, persistent sound toggle, `prefers-reduced-motion` support, and an upfront gas note (each beat is a Base tx, gas < $0.01)
+- **Trust signals in the footer** — verified-contract, source, and MIT license links; no tracking, no cookies
 - **No build step** — single `index.html`, deploys to anything
 
 ## Stack
@@ -30,7 +34,7 @@ A single-page dapp where every chest beat is an onchain transaction on Base. The
 - `index.html` — vanilla HTML/CSS/JS, no framework, no build
 - `GorillaCounter.sol` — Solidity 0.8.31, deployed on Base mainnet
 - `@farcaster/miniapp-sdk` via ESM for Mini App embedding
-- Direct `eth_call` / `eth_sendTransaction` to a public Base RPC — no library dependency
+- Direct `eth_call` / `eth_sendTransaction` to public Base RPCs (with fallback rotation) — no library dependency
 - Custom keccak256 implementation for Basenames reverse resolution
 
 ## Deploy
