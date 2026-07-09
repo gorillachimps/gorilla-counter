@@ -98,6 +98,7 @@
     button.is-busy { opacity: 0.9; cursor: progress; }
     .spinner { display: inline-block; width: 0.9em; height: 0.9em; border: 2px solid rgba(255,255,255,0.35); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: -0.12em; margin-right: 0.4em; }
     @keyframes spin { to { transform: rotate(360deg); } }
+    .gas-note { text-align: center; font-size: 0.72rem; color: var(--text-muted); margin: 0.45rem 0 0; }
 
     .disconnect-btn { background: transparent; border: 1px solid rgba(255,100,100,0.3); color: #ff6b6b; font-size: 0.75rem; padding: 0.4rem 0.8rem; margin-top: 0.4rem; text-transform: none; letter-spacing: 0; font-weight: 500; }
     .disconnect-btn:hover { background: rgba(255,100,100,0.1); box-shadow: none; transform: none; }
@@ -271,8 +272,13 @@
     <!-- BEAT -->
     <div class="card">
       <button id="beatBtn" onclick="beatChest()" disabled>&#x1F4A5; Beat Chest!</button>
+      <div class="gas-note">Each beat is a Base tx &mdash; gas &lt; $0.01</div>
       <div style="margin-top: 0.75rem;">
         <input type="text" id="nameInput" placeholder="Enter your gorilla name..." maxlength="32">
+        <div id="nameMeta" style="display:flex;justify-content:space-between;align-items:center;font-size:0.7rem;color:var(--text-muted);margin:0.15rem 0.15rem 0.35rem;">
+          <span id="currentName"></span>
+          <span id="byteCounter">0/32 bytes</span>
+        </div>
         <button class="secondary" id="nameBtn" onclick="setName()" disabled>&#x1F3F7; Set Name</button>
       </div>
       <!-- Share -->
@@ -697,6 +703,29 @@
       el.textContent = streak > 0 ? streak + '\u{1F525}' : '-';
     }
 
+    // ==== NAME UX ====
+    // Reflect the user's current on-chain gorilla name and switch the button
+    // to "Rename" once one is set. Name is on-chain (attacker-controlled) —
+    // render via textContent, never innerHTML.
+    function updateNameUI(name) {
+      const cur = document.getElementById('currentName');
+      const btn = document.getElementById('nameBtn');
+      if (name) {
+        cur.textContent = 'Current: ' + name;
+        if (!btn.classList.contains('is-busy')) btn.innerHTML = '\u{1F3F7} Rename';
+      } else {
+        cur.textContent = '';
+        if (!btn.classList.contains('is-busy')) btn.innerHTML = '\u{1F3F7} Set Name';
+      }
+    }
+    function updateByteCounter() {
+      const input = document.getElementById('nameInput');
+      const c = document.getElementById('byteCounter');
+      const n = new TextEncoder().encode(input.value).length;
+      c.textContent = n + '/32 bytes';
+      c.style.color = n > 32 ? '#ff6b6b' : '';
+    }
+
     // ==== MILESTONES ====
     function updateMilestones(beats) {
       const card = document.getElementById('milestonesCard');
@@ -879,6 +908,8 @@
       document.getElementById('streakCount').textContent = '-';
       document.getElementById('milestonesCard').style.display = 'none';
       document.getElementById('statusMsg').innerHTML = '';
+      document.getElementById('nameInput').value = '';
+      updateNameUI(''); updateByteCounter();
       showToast('Wallet disconnected');
     }
 
@@ -894,6 +925,7 @@
           document.getElementById('yourBeats').textContent = yourBeats;
           updateMilestones(yourBeats);
           updateStreakUI();
+          try { updateNameUI(decodeString(await ethCall(SELECTORS.gorillaNames + encodeAddress(userAddress)))); } catch {}
         }
         const alpha = await ethCall(SELECTORS.alphaGorilla);
         const alphaAddr = decodeAddress(alpha);
@@ -1020,6 +1052,7 @@
         }
       }
     })();
+    document.getElementById('nameInput').addEventListener('input', updateByteCounter);
     refreshStats();
     indexGorillas();
     setInterval(refreshStats, 15000);
