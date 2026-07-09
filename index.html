@@ -163,6 +163,16 @@
     .leaderboard-empty { text-align: center; padding: 1.5rem; color: var(--text-muted); font-size: 0.85rem; }
     .lb-loading { text-align: center; padding: 1rem; color: var(--text-muted); font-size: 0.8rem; }
 
+    /* Loading skeletons */
+    .skel { display: inline-block; border-radius: 6px; background: linear-gradient(90deg, rgba(76,175,80,0.08) 25%, rgba(76,175,80,0.20) 50%, rgba(76,175,80,0.08) 75%); background-size: 200% 100%; animation: shimmer 1.4s ease-in-out infinite; }
+    .skel-num { width: 2.4ch; height: 1.5rem; vertical-align: -0.2rem; }
+    .skel-row { display: block; width: 100%; height: 2.3rem; margin: 0.35rem 0; border-radius: 8px; }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+    /* Your rank */
+    .your-rank { text-align: center; font-size: 0.85rem; color: var(--green-light); background: rgba(76,175,80,0.1); border: 1px solid rgba(76,175,80,0.2); border-radius: 10px; padding: 0.6rem 0.75rem; margin-bottom: 0.75rem; }
+    .your-rank .yr-label { display: inline-block; font-weight: 700; text-transform: uppercase; font-size: 0.62rem; letter-spacing: 1px; color: var(--text-muted); margin-right: 0.4rem; }
+
     /* How it works */
     .how-it-works { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; margin-top: 0.5rem; }
     .step { text-align: center; padding: 1rem 0.5rem; background: rgba(30,60,30,0.3); border-radius: 12px; border: 1px solid rgba(76,175,80,0.08); }
@@ -253,10 +263,10 @@
     <!-- STATS -->
     <div class="card">
       <div class="stats stats-4">
-        <div class="stat-box"><div class="label">Total Beats</div><div class="value" id="totalBeats">-</div></div>
+        <div class="stat-box"><div class="label">Total Beats</div><div class="value" id="totalBeats"><span class="skel skel-num"></span></div></div>
         <div class="stat-box"><div class="label">Your Beats</div><div class="value" id="yourBeats">-</div></div>
         <div class="stat-box"><div class="label">Streak</div><div class="value small" id="streakCount">-</div></div>
-        <div class="stat-box"><div class="label">Gorillas</div><div class="value small" id="gorillaCount">-</div></div>
+        <div class="stat-box"><div class="label">Gorillas</div><div class="value small" id="gorillaCount"><span class="skel skel-num"></span></div></div>
       </div>
       <div class="alpha-banner" id="alphaBanner" style="display:none;">
         &#x1F451; <strong>Alpha Gorilla:</strong> <span id="alphaAddr"></span> &middot; <span id="alphaBeatsCount"></span> beats
@@ -293,7 +303,8 @@
     <!-- LEADERBOARD -->
     <div class="card">
       <h2>&#x1F3C6; Leaderboard</h2>
-      <div id="leaderboard"><div class="lb-loading">Loading gorillas from chain...</div></div>
+      <div id="yourRank" class="your-rank" style="display:none;"></div>
+      <div id="leaderboard"><div class="skel skel-row"></div><div class="skel skel-row"></div><div class="skel skel-row"></div><div class="skel skel-row"></div></div>
     </div>
 
     <!-- HOW IT WORKS -->
@@ -431,6 +442,7 @@
     ];
 
     let userAddress = null;
+    let totalBeatsNum = 0;
     let soundEnabled = (() => { try { return localStorage.getItem('gorilla_sound') !== 'off'; } catch { return true; } })();
     let knownGorillas = new Map(); // addr -> { beats, name, basename }
     let basenameCache = new Map();
@@ -778,7 +790,7 @@
         for (let i = 0; i < cache.addrs.length; i += 10) {
           await Promise.all(cache.addrs.slice(i, i + 10).map(fetchGorilla));
         }
-        document.getElementById('gorillaCount').textContent = known.size;
+        document.getElementById('gorillaCount').textContent = known.size.toLocaleString();
         renderLeaderboard();
 
         // 2) Scan forward from the cached block for new gorillas
@@ -802,7 +814,7 @@
         for (let i = 0; i < fresh.length; i += 10) {
           await Promise.all(fresh.slice(i, i + 10).map(fetchGorilla));
         }
-        document.getElementById('gorillaCount').textContent = known.size;
+        document.getElementById('gorillaCount').textContent = known.size.toLocaleString();
         renderLeaderboard();
       } catch (err) {
         console.error('Index error:', err);
@@ -830,10 +842,33 @@
                          e.name ? esc(e.name) :
                          `<span class="addr-mono">${e.addr.slice(0, 6)}...${e.addr.slice(-4)}</span>`;
         const isYou = userAddress && e.addr.toLowerCase() === userAddress.toLowerCase();
-        html += `<tr class="leaderboard-row ${isYou ? 'is-you' : ''}"><td class="${rankClass}">${rank}</td><td>${display}${isYou ? ' (you)' : ''}</td><td>${e.beats}</td></tr>`;
+        html += `<tr class="leaderboard-row ${isYou ? 'is-you' : ''}"><td class="${rankClass}">${rank}</td><td>${display}${isYou ? ' (you)' : ''}</td><td>${e.beats.toLocaleString()}</td></tr>`;
       });
       html += '</tbody></table>';
       container.innerHTML = html;
+      updateYourRank();
+    }
+
+    // "Your rank" line — where the connected wallet sits and the gap to climb
+    function updateYourRank() {
+      const el = document.getElementById('yourRank');
+      if (!el) return;
+      if (!userAddress) { el.style.display = 'none'; return; }
+      const sorted = Array.from(knownGorillas.values()).sort((a, b) => b.beats - a.beats);
+      const idx = sorted.findIndex(e => e.addr && e.addr.toLowerCase() === userAddress.toLowerCase());
+      if (idx === -1) { el.style.display = 'none'; return; }
+      const you = sorted[idx], rank = idx + 1, total = sorted.length;
+      let tail;
+      if (idx === 0) {
+        tail = "you're the Alpha Gorilla \u{1F451}";
+      } else {
+        const ahead = sorted[idx - 1];
+        const gap = ahead.beats - you.beats;
+        const aheadName = ahead.basename || ahead.name || (ahead.addr.slice(0, 6) + '…' + ahead.addr.slice(-4));
+        tail = gap === 0 ? `tied with ${esc(aheadName)}` : `${gap} beat${gap === 1 ? '' : 's'} behind ${esc(aheadName)}`;
+      }
+      el.innerHTML = `<span class="yr-label">Your rank</span> #${rank} of ${total} — ${tail}`;
+      el.style.display = 'block';
     }
 
     // ==== PROVIDER ABSTRACTION ====
@@ -917,12 +952,12 @@
     async function refreshStats() {
       if (!CONTRACT_ADDRESS) return;
       try {
-        const total = await ethCall(SELECTORS.chestBeats);
-        document.getElementById('totalBeats').textContent = decodeUint256(total);
+        totalBeatsNum = decodeUint256(await ethCall(SELECTORS.chestBeats));
+        document.getElementById('totalBeats').textContent = totalBeatsNum.toLocaleString();
         if (userAddress) {
           const yours = await ethCall(SELECTORS.gorillaBeats + encodeAddress(userAddress));
           const yourBeats = decodeUint256(yours);
-          document.getElementById('yourBeats').textContent = yourBeats;
+          document.getElementById('yourBeats').textContent = yourBeats.toLocaleString();
           updateMilestones(yourBeats);
           updateStreakUI();
           try { updateNameUI(decodeString(await ethCall(SELECTORS.gorillaNames + encodeAddress(userAddress)))); } catch {}
@@ -935,7 +970,7 @@
           const alphaBasename = await resolveBasename(alphaAddr);
           document.getElementById('alphaBanner').style.display = 'block';
           document.getElementById('alphaAddr').textContent = alphaBasename || (alphaAddr.slice(0,6) + '...' + alphaAddr.slice(-4));
-          document.getElementById('alphaBeatsCount').textContent = decodeUint256(alphaB);
+          document.getElementById('alphaBeatsCount').textContent = decodeUint256(alphaB).toLocaleString();
         }
       } catch(err) { console.error('Stats error:', err); }
     }
@@ -991,7 +1026,7 @@
         triggerBeatAnimation();
         triggerHaptic();
         const flash = document.getElementById('beatFlash');
-        flash.textContent = (parseInt(document.getElementById('totalBeats').textContent)||0)+1;
+        flash.textContent = (totalBeatsNum + 1).toLocaleString();
         flash.classList.remove('show'); void flash.offsetWidth; flash.classList.add('show');
         showStatus(`Beat sent — confirming... <a href="https://basescan.org/tx/${txHash}" target="_blank">View TX \u{2197}</a>`, 'info');
         const ok = await waitForTx(txHash);
