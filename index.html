@@ -3,7 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0a0f0a">
   <title>Gorilla Counter - Beat Your Chest on Base</title>
+
+  <!-- Preconnect to Google Fonts (the CSS @import is render-blocking) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- Open Graph / Social Sharing -->
   <meta property="og:title" content="Gorilla Counter - Beat Your Chest on Base">
@@ -34,6 +39,7 @@
     @import url('https://fonts.googleapis.com/css2?family=Righteous&family=Inter:wght@400;500;600;700&display=swap');
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
+      color-scheme: dark;
       --green-primary: #4CAF50; --green-light: #81C784; --green-dark: #2E7D32; --green-darker: #1B5E20;
       --orange-primary: #FF6D00; --orange-light: #FF9100; --orange-dark: #E65100;
       --bg-dark: #0a0f0a; --bg-card: rgba(15, 30, 15, 0.85); --text-primary: #e0e0e0; --text-muted: #6a9a6a;
@@ -190,6 +196,15 @@
       .stats-4 { grid-template-columns: 1fr 1fr; }
     }
     a { color: var(--green-primary); }
+
+    /* Respect users who ask for less motion — kill decorative animation */
+    @media (prefers-reduced-motion: reduce) {
+      body::after, .network-dot, .leaf, #beatBtn:not(:disabled) { animation: none !important; }
+      .shake, .gorilla.beating, .impact-ring.active,
+      .stat-box .value.pop, .beat-flash.show, .spinner, .skel { animation: none !important; }
+      .beat-flash.show { opacity: 0 !important; }
+      html { scroll-behavior: auto !important; }
+    }
   </style>
 </head>
 <body>
@@ -352,14 +367,17 @@
   </script>
 
   <script>
-    for (let i = 0; i < 6; i++) {
-      const leaf = document.createElement('div');
-      leaf.className = 'leaf';
-      leaf.innerHTML = ['\u{1F343}', '\u{1F344}', '\u{1F331}'][Math.floor(Math.random() * 3)];
-      leaf.style.left = Math.random() * 100 + '%';
-      leaf.style.animationDuration = (14 + Math.random() * 20) + 's';
-      leaf.style.animationDelay = (Math.random() * 15) + 's';
-      document.body.appendChild(leaf);
+    const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!prefersReducedMotion()) {
+      for (let i = 0; i < 6; i++) {
+        const leaf = document.createElement('div');
+        leaf.className = 'leaf';
+        leaf.innerHTML = ['\u{1F343}', '\u{1F344}', '\u{1F331}'][Math.floor(Math.random() * 3)];
+        leaf.style.left = Math.random() * 100 + '%';
+        leaf.style.animationDuration = (14 + Math.random() * 20) + 's';
+        leaf.style.animationDelay = (Math.random() * 15) + 's';
+        document.body.appendChild(leaf);
+      }
     }
   </script>
 
@@ -497,7 +515,7 @@
       update() { this.x+=this.vx;this.vy+=this.gravity;this.y+=this.vy;this.vx*=0.98;this.life-=this.decay;this.rotation+=this.rotSpeed; }
       draw() { ctx.save();ctx.translate(this.x,this.y);ctx.rotate(this.rotation);ctx.globalAlpha=this.life;if(this.type==='banana'){ctx.font=this.size*2+'px serif';ctx.fillText('\u{1F34C}',-this.size,this.size/2);}else if(this.type==='star'){ctx.fillStyle='#FF9100';ctx.beginPath();for(let i=0;i<5;i++){const a=(i*4*Math.PI)/5-Math.PI/2;ctx[i===0?'moveTo':'lineTo'](Math.cos(a)*this.size,Math.sin(a)*this.size);}ctx.fill();}else{ctx.fillStyle=this.type==='green'?'#4CAF50':'#FF6D00';ctx.fillRect(-this.size/2,-this.size/2,this.size,this.size);}ctx.restore(); }
     }
-    function spawnBeatParticles(){const cx=window.innerWidth/2,cy=window.innerHeight*0.18;for(let i=0;i<25;i++)particles.push(new Particle(cx,cy,['banana','star','green','orange'][Math.floor(Math.random()*4)]));}
+    function spawnBeatParticles(){if(prefersReducedMotion())return;const cx=window.innerWidth/2,cy=window.innerHeight*0.18;for(let i=0;i<25;i++)particles.push(new Particle(cx,cy,['banana','star','green','orange'][Math.floor(Math.random()*4)]));}
     function animateParticles(){ctx.clearRect(0,0,canvas.width,canvas.height);particles=particles.filter(p=>p.life>0);particles.forEach(p=>{p.update();p.draw();});requestAnimationFrame(animateParticles);}
     animateParticles();
 
