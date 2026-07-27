@@ -12,6 +12,8 @@ const SEL = {
 
 // Known gorillas as of the last seed refresh — rank is computed against this
 // set so a card render is a fixed, small number of RPC reads (no log scan).
+// Must mirror INDEX_SEED.addrs in index.html; a player missing here is
+// unranked on their share card. Last verified 2026-07-27 @ block 49,189,213.
 export const KNOWN = [
   '0x7584b2caf8070852f7887ee10d86f981dc128eec',
   '0x549063dd3380440e2c92c9709a49b616237c0e28',
