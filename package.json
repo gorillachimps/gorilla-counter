@@ -1,0 +1,11 @@
+{
+  "name": "gorilla-counter",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Onchain chest-beating competition on Base. Static app + edge routes for personalised share cards.",
+  "license": "MIT",
+  "dependencies": {
+    "@vercel/og": "^0.6.3"
+  }
+}

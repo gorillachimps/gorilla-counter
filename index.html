@@ -32,306 +32,407 @@
   <!-- Base.dev app verification -->
   <meta name="base:app_id" content="69931a50e0d5d2cf831b5deb">
 
-  <!-- Favicon -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#x1F98D;</text></svg>">
+  <!-- Favicon / touch icons -->
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="preload" as="image" href="/gorilla-portrait.jpg">
 
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Righteous&family=Inter:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
       color-scheme: dark;
-      --green-primary: #4CAF50; --green-light: #81C784; --green-dark: #2E7D32; --green-darker: #1B5E20;
-      --orange-primary: #FF6D00; --orange-light: #FF9100; --orange-dark: #E65100;
-      --bg-dark: #0a0f0a; --bg-card: rgba(15, 30, 15, 0.85); --text-primary: #e0e0e0; --text-muted: #6a9a6a;
+      --bg: #080B09;
+      --surface: #0E1411;
+      --surface-2: #141C17;
+      --line: rgba(255,255,255,0.08);
+      --line-strong: rgba(255,255,255,0.15);
+      --text: #E8EFEA;
+      --text-2: #95A99C;
+      --text-3: #61736A;
+      --brand: #5BC46F;
+      --brand-dim: #2F7A43;
+      --accent: #FF7A1A;
+      --radius: 14px;
+      --radius-sm: 10px;
+      --maxw: 1060px;
     }
-    body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; overflow-x: hidden; position: relative; }
-    body::before { content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(ellipse at 20% 80%, rgba(34,139,34,0.12) 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, rgba(0,100,0,0.08) 0%, transparent 50%), radial-gradient(ellipse at 50% 50%, rgba(20,60,20,0.15) 0%, transparent 70%), linear-gradient(180deg, #0a0f0a 0%, #0d1a0d 50%, #0a0f0a 100%); z-index: -2; }
-    body::after { content: ''; position: fixed; top: 0; left: -50%; right: -50%; bottom: 0; background: radial-gradient(ellipse at 30% 70%, rgba(100,200,100,0.03) 0%, transparent 50%), radial-gradient(ellipse at 70% 30%, rgba(50,150,50,0.03) 0%, transparent 50%); animation: fogDrift 20s ease-in-out infinite; z-index: -1; }
-    @keyframes fogDrift { 0%,100% { transform: translateX(0); } 50% { transform: translateX(10%); } }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.5;
+      -webkit-font-smoothing: antialiased; overflow-x: hidden;
+    }
+    body::before {
+      content: ''; position: fixed; inset: 0; pointer-events: none; z-index: -1;
+      background: radial-gradient(900px 520px at 50% -8%, rgba(91,196,111,0.07), transparent 70%);
+    }
+    a { color: var(--brand); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    :focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; border-radius: 4px; }
 
-    .navbar { position: sticky; top: 0; z-index: 50; width: 100%; padding: 0.75rem 1.5rem; background: rgba(10,15,10,0.9); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(76,175,80,0.15); display: flex; align-items: center; justify-content: space-between; }
-    .nav-brand { display: flex; align-items: center; gap: 0.6rem; text-decoration: none; }
-    .nav-brand .logo { font-size: 1.6rem; }
-    .nav-brand .brand-text { font-family: 'Righteous', cursive; font-size: 1.2rem; background: linear-gradient(135deg, var(--green-primary), var(--green-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-    .nav-right { display: flex; align-items: center; gap: 0.75rem; }
-    .network-badge { display: flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.75rem; border-radius: 20px; background: rgba(76,175,80,0.1); border: 1px solid rgba(76,175,80,0.25); font-size: 0.75rem; font-weight: 600; color: var(--green-light); }
-    .network-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green-primary); animation: pulse 2s ease-in-out infinite; }
-    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
-    .nav-link { color: var(--text-muted); text-decoration: none; font-size: 0.8rem; font-weight: 500; padding: 0.35rem 0.6rem; border-radius: 6px; transition: all 0.2s; }
-    .nav-link:hover { color: var(--green-light); background: rgba(76,175,80,0.1); }
-    .sound-toggle { cursor: pointer; font-size: 1.1rem; padding: 0.3rem; border-radius: 6px; transition: all 0.2s; background: none; border: none; width: auto; margin: 0; text-transform: none; }
-    .sound-toggle:hover { background: rgba(76,175,80,0.1); }
-    .sound-toggle::after { display: none; }
+    /* ---- icons ---- */
+    .i { width: 1em; height: 1em; display: inline-block; vertical-align: -0.135em; fill: none;
+         stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .i-solid { fill: currentColor; stroke: none; }
 
-    .main-content { display: flex; flex-direction: column; align-items: center; padding: 1.5rem 1rem 2rem; max-width: 560px; margin: 0 auto; }
-    #particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 100; }
-    .vine-left, .vine-right { position: fixed; top: 0; width: 50px; height: 100%; pointer-events: none; z-index: -1; }
-    .vine-left { left: 0; background: linear-gradient(to right, rgba(34,100,34,0.08), transparent); }
-    .vine-right { right: 0; background: linear-gradient(to left, rgba(34,100,34,0.08), transparent); }
-    .leaf { position: fixed; font-size: 1.2rem; opacity: 0.12; pointer-events: none; z-index: -1; animation: leafFloat linear infinite; }
-    @keyframes leafFloat { 0% { transform: translateY(-20px) rotate(0deg); opacity: 0; } 10% { opacity: 0.12; } 90% { opacity: 0.12; } 100% { transform: translateY(100vh) rotate(360deg); opacity: 0; } }
+    /* ---- nav ---- */
+    .navbar { position: sticky; top: 0; z-index: 50; background: rgba(8,11,9,0.85);
+              backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); }
+    .nav-inner { max-width: var(--maxw); margin: 0 auto; padding: 0.7rem 1.25rem;
+                 display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    .nav-brand { display: flex; align-items: center; gap: 0.55rem; color: var(--text); }
+    .nav-brand:hover { text-decoration: none; }
+    .nav-brand img { width: 28px; height: 28px; border-radius: 8px; display: block; }
+    .nav-brand b { font-size: 0.95rem; font-weight: 700; letter-spacing: -0.01em; }
+    .nav-right { display: flex; align-items: center; gap: 0.5rem; }
+    .nav-link { color: var(--text-2); font-size: 0.82rem; font-weight: 500; padding: 0.35rem 0.55rem; border-radius: 7px; }
+    .nav-link:hover { color: var(--text); background: rgba(255,255,255,0.05); text-decoration: none; }
+    .icon-btn { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 8px;
+                border: 1px solid var(--line); background: transparent; color: var(--text-2);
+                cursor: pointer; font-size: 1rem; transition: color .15s, background .15s; }
+    .icon-btn:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+    .chip { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.32rem 0.65rem;
+            border-radius: 999px; background: rgba(91,196,111,0.09); border: 1px solid rgba(91,196,111,0.22);
+            font-size: 0.72rem; font-weight: 600; color: #A6E0B3; white-space: nowrap; }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--brand); }
 
-    .gorilla-container { position: relative; margin: 0.5rem 0; cursor: default; user-select: none; }
-    .gorilla { font-size: 5.5rem; display: block; filter: drop-shadow(0 0 25px rgba(34,139,34,0.3)); }
-    .gorilla.beating { animation: chestBeat 0.6s ease-out; }
-    @keyframes chestBeat { 0% { transform: scale(1); } 15% { transform: scale(1.3) rotate(-5deg); } 30% { transform: scale(0.9) rotate(5deg); } 45% { transform: scale(1.2) rotate(-3deg); } 60% { transform: scale(0.95); } 100% { transform: scale(1); } }
-    .impact-ring { position: absolute; top: 50%; left: 50%; width: 20px; height: 20px; border: 3px solid rgba(76,175,80,0.8); border-radius: 50%; transform: translate(-50%,-50%) scale(0); pointer-events: none; }
-    .impact-ring.active { animation: impactExpand 0.8s ease-out forwards; }
-    @keyframes impactExpand { 0% { transform: translate(-50%,-50%) scale(0); opacity: 1; } 100% { transform: translate(-50%,-50%) scale(8); opacity: 0; } }
-    .shake { animation: screenShake 0.4s ease-out; }
-    @keyframes screenShake { 0%,100% { transform: translate(0); } 10% { transform: translate(-6px,3px); } 20% { transform: translate(5px,-5px); } 30% { transform: translate(-3px,2px); } 50% { transform: translate(2px,-2px); } }
+    /* ---- layout ---- */
+    .wrap { max-width: var(--maxw); margin: 0 auto; padding: 1.75rem 1.25rem 3rem; }
+    .grid { display: grid; gap: 1rem; align-items: start; }
+    @media (min-width: 900px) {
+      .grid { grid-template-columns: minmax(0,1fr) minmax(0,400px); }
+      .col-right { position: sticky; top: 74px; }
+    }
+    .stack { display: grid; gap: 1rem; }
+    .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.25rem; }
+    .sec-h { display: flex; align-items: center; gap: 0.5rem; font-size: 0.72rem; font-weight: 700;
+             text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-3); margin-bottom: 0.9rem; }
+    .sec-h .i { width: 14px; height: 14px; color: var(--text-3); }
 
-    h1 { font-family: 'Righteous', cursive; font-size: 2.5rem; margin-bottom: 0.2rem; background: linear-gradient(135deg, var(--green-primary), var(--green-light), #A5D6A7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-    .subtitle { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.25rem; }
-    h2 { font-family: 'Righteous', cursive; font-size: 1.3rem; color: var(--green-light); margin-bottom: 1rem; text-align: center; }
+    /* ---- hero ---- */
+    .hero { display: flex; align-items: center; gap: 1.15rem; margin-bottom: 1.25rem; }
+    .portrait { position: relative; flex: none; width: 92px; height: 92px; }
+    .portrait img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%;
+                    border: 1px solid rgba(91,196,111,0.28); display: block; }
+    .portrait.beating img { animation: thump 0.55s ease-out; }
+    @keyframes thump { 0%,100% { transform: scale(1); } 22% { transform: scale(1.09); } 45% { transform: scale(0.97); } 70% { transform: scale(1.04); } }
+    .impact-ring { position: absolute; top: 50%; left: 50%; width: 92px; height: 92px; margin: -46px 0 0 -46px;
+                   border: 1.5px solid rgba(91,196,111,0.55); border-radius: 50%;
+                   transform: scale(0.6); opacity: 0; pointer-events: none; }
+    .impact-ring.active { animation: ripple 0.9s ease-out forwards; }
+    @keyframes ripple { 0% { transform: scale(0.6); opacity: 0.8; } 100% { transform: scale(2.1); opacity: 0; } }
+    h1 { font-size: 2.05rem; font-weight: 800; letter-spacing: -0.032em; line-height: 1.05; }
+    .subtitle { color: var(--text-2); font-size: 0.92rem; margin-top: 0.35rem; }
 
-    .card { background: var(--bg-card); backdrop-filter: blur(10px); border-radius: 16px; padding: 1.5rem; margin: 0.6rem 0; width: 100%; border: 1px solid rgba(76,175,80,0.15); box-shadow: 0 4px 24px rgba(0,0,0,0.25); }
-
-    button { background: linear-gradient(135deg, var(--green-dark), var(--green-primary)); color: white; border: none; padding: 0.85rem 1.5rem; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; width: 100%; margin: 0.3rem 0; transition: all 0.3s; text-transform: uppercase; letter-spacing: 0.5px; position: relative; overflow: hidden; }
-    button::after { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent); transition: left 0.5s; }
-    button:hover::after { left: 100%; }
-    button:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(76,175,80,0.25); }
-    button:active { transform: translateY(0); }
-    button:disabled { background: #2a2a2a; cursor: not-allowed; transform: none; box-shadow: none; }
-    button:disabled::after { display: none; }
-    button.secondary { background: linear-gradient(135deg, var(--green-darker), var(--green-dark)); font-size: 0.9rem; }
-    button.is-busy { opacity: 0.9; cursor: progress; }
-    .spinner { display: inline-block; width: 0.9em; height: 0.9em; border: 2px solid rgba(255,255,255,0.35); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: -0.12em; margin-right: 0.4em; }
+    /* ---- buttons ---- */
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+           font-family: inherit; font-size: 0.9rem; font-weight: 600; line-height: 1;
+           padding: 0.72rem 1.1rem; border-radius: var(--radius-sm); cursor: pointer;
+           border: 1px solid var(--line-strong); background: var(--surface-2); color: var(--text);
+           transition: background .15s, border-color .15s, opacity .15s; }
+    .btn:hover:not(:disabled) { background: #1B241E; border-color: rgba(255,255,255,0.22); }
+    .btn:disabled { opacity: 0.42; cursor: not-allowed; }
+    .btn-block { width: 100%; }
+    .btn-lg { padding: 0.88rem 1.25rem; font-size: 0.97rem; }
+    .btn-primary { background: var(--accent); border-color: transparent; color: #180A02; font-weight: 700; }
+    .btn-primary:hover:not(:disabled) { background: #FF8C38; border-color: transparent; }
+    /* A faded-orange disabled state reads as mud — fall back to a neutral chip */
+    .btn-primary:disabled { background: var(--surface-2); border-color: var(--line); color: var(--text-3); opacity: 1; }
+    .btn-ghost { background: transparent; }
+    .btn-sm { padding: 0.4rem 0.6rem; font-size: 0.75rem; font-weight: 600; }
+    .btn.is-busy { cursor: progress; }
+    .spinner { display: inline-block; width: 0.85em; height: 0.85em; border: 2px solid currentColor;
+               border-top-color: transparent; border-radius: 50%; animation: spin 0.7s linear infinite; opacity: 0.8; }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .gas-note { text-align: center; font-size: 0.72rem; color: var(--text-muted); margin: 0.45rem 0 0; }
+    .gas-note { text-align: center; font-size: 0.72rem; color: var(--text-3); margin-top: 0.55rem; }
+    .btn-row { display: flex; gap: 0.5rem; }
+    .btn-row .btn { flex: 1; }
 
-    .disconnect-btn { background: transparent; border: 1px solid rgba(255,100,100,0.3); color: #ff6b6b; font-size: 0.75rem; padding: 0.4rem 0.8rem; margin-top: 0.4rem; text-transform: none; letter-spacing: 0; font-weight: 500; }
-    .disconnect-btn:hover { background: rgba(255,100,100,0.1); box-shadow: none; transform: none; }
-    .disconnect-btn::after { display: none; }
+    /* ---- wallet ---- */
+    .wallet-row { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; flex-wrap: wrap; }
+    .addr-mono { font-family: ui-monospace, 'SF Mono', 'Fira Code', monospace; font-size: 0.78rem; color: var(--text-2); }
 
-    #beatBtn:not(:disabled) { background: linear-gradient(135deg, var(--orange-dark), var(--orange-primary), var(--orange-light)); animation: beatPulse 2s ease-in-out infinite; font-size: 1.1rem; padding: 1rem; }
-    @keyframes beatPulse { 0%,100% { box-shadow: 0 0 10px rgba(255,109,0,0.25); } 50% { box-shadow: 0 0 25px rgba(255,109,0,0.5); } }
+    /* ---- stats ---- */
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.55rem; }
+    .stat { background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--radius-sm);
+            padding: 0.7rem 0.5rem; text-align: center; }
+    .stat .k { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.09em;
+               color: var(--text-3); font-weight: 700; white-space: nowrap; }
+    .stat .v { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.02em;
+               font-variant-numeric: tabular-nums; margin-top: 0.2rem; line-height: 1.15; }
+    .stat .v.pop { animation: pop 0.45s ease-out; }
+    @keyframes pop { 0%,100% { transform: scale(1); } 45% { transform: scale(1.16); color: var(--accent); } }
 
-    input { width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid rgba(76,175,80,0.2); background: rgba(10,20,10,0.8); color: var(--text-primary); font-size: 0.95rem; margin: 0.4rem 0; transition: border-color 0.3s; }
-    input:focus { outline: none; border-color: var(--green-primary); }
+    /* ---- alpha ---- */
+    .alpha { display: flex; align-items: center; gap: 0.55rem; margin-top: 0.8rem; padding: 0.7rem 0.85rem;
+             border: 1px solid rgba(255,122,26,0.26); background: rgba(255,122,26,0.07);
+             border-radius: var(--radius-sm); font-size: 0.84rem; color: var(--text); }
+    .alpha .i { color: var(--accent); flex: none; width: 15px; height: 15px; }
+    .alpha .lbl { color: var(--text-3); font-weight: 700; text-transform: uppercase; font-size: 0.62rem; letter-spacing: 0.09em; margin-right: 0.45rem; }
 
-    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin: 0.4rem 0; }
-    .stats-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
-    .stat-box { background: rgba(30,60,30,0.5); border-radius: 12px; padding: 0.85rem; text-align: center; border: 1px solid rgba(76,175,80,0.1); }
-    .stat-box .label { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
-    .stat-box .value { font-family: 'Righteous', cursive; font-size: 1.8rem; color: var(--green-primary); transition: transform 0.3s; }
-    .stat-box .value.pop { animation: popNumber 0.4s ease-out; }
-    .stat-box .value.small { font-size: 1.2rem; }
-    @keyframes popNumber { 0% { transform: scale(1); } 50% { transform: scale(1.3); color: var(--orange-light); } 100% { transform: scale(1); } }
+    /* ---- inputs ---- */
+    input[type="text"] { width: 100%; padding: 0.7rem 0.8rem; border-radius: var(--radius-sm);
+      border: 1px solid var(--line-strong); background: #0A0F0C; color: var(--text);
+      font-family: inherit; font-size: 0.9rem; font-weight: 500; }
+    input[type="text"]::placeholder { color: var(--text-3); }
+    input[type="text"]:focus { outline: none; border-color: var(--brand-dim); box-shadow: 0 0 0 3px rgba(91,196,111,0.12); }
+    .field-meta { display: flex; justify-content: space-between; align-items: center;
+                  font-size: 0.7rem; color: var(--text-3); margin: 0.35rem 0.15rem 0.55rem; }
 
-    .status { margin: 0.6rem 0; padding: 0.7rem; border-radius: 10px; text-align: center; font-size: 0.85rem; }
-    .status.success { background: rgba(27,67,50,0.8); color: var(--green-light); border: 1px solid rgba(76,175,80,0.25); }
-    .status.error { background: rgba(61,0,0,0.8); color: #ff6b6b; border: 1px solid rgba(255,107,107,0.25); }
-    .status.info { background: rgba(26,26,78,0.8); color: #a0a0ff; border: 1px solid rgba(160,160,255,0.15); }
+    /* ---- status ---- */
+    .status { border-radius: var(--radius-sm); padding: 0.65rem 0.8rem; font-size: 0.83rem; border: 1px solid; }
+    .status.success { background: rgba(91,196,111,0.08); border-color: rgba(91,196,111,0.3); color: #A6E0B3; }
+    .status.error { background: rgba(255,95,95,0.07); border-color: rgba(255,95,95,0.28); color: #FF9E9E; }
+    .status.info { background: rgba(255,255,255,0.04); border-color: var(--line-strong); color: var(--text-2); }
+    .status a { color: inherit; text-decoration: underline; opacity: 0.9; }
 
-    .alpha-banner { background: linear-gradient(135deg, rgba(230,81,0,0.7), rgba(46,125,50,0.7)); border-radius: 12px; padding: 0.85rem; text-align: center; margin: 0.6rem 0; font-weight: 600; font-size: 0.9rem; border: 1px solid rgba(255,152,0,0.2); }
+    /* ---- leaderboard ---- */
+    .lb { display: flex; flex-direction: column; gap: 0.35rem; }
+    .lb-row { display: grid; grid-template-columns: 24px minmax(0,1fr) auto; align-items: center; gap: 0.7rem;
+              padding: 0.6rem 0.7rem; background: var(--surface-2); border: 1px solid transparent;
+              border-radius: var(--radius-sm); font-size: 0.86rem; }
+    .lb-row.is-you { border-color: rgba(91,196,111,0.32); background: rgba(91,196,111,0.08); }
+    .lb-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .you-tag { color: var(--brand); font-size: 0.7rem; font-weight: 700; margin-left: 0.35rem; }
+    .rank { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center;
+            font-size: 0.7rem; font-weight: 700; background: rgba(255,255,255,0.07);
+            color: var(--text-2); font-variant-numeric: tabular-nums; }
+    .rank-1 { background: var(--accent); color: #180A02; }
+    .rank-2 { background: rgba(226,232,228,0.85); color: #0C100D; }
+    .rank-3 { background: rgba(140,86,38,0.9); color: #F3DCC6; }
+    .beats { font-weight: 700; font-variant-numeric: tabular-nums; }
+    .basename { color: #A6E0B3; font-weight: 600; }
+    .lb-empty { text-align: center; padding: 1.4rem 0.5rem; color: var(--text-3); font-size: 0.84rem; }
 
-    /* Milestones */
-    .milestones { display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin: 0.5rem 0; }
-    .milestone { display: flex; align-items: center; gap: 0.25rem; padding: 0.3rem 0.6rem; border-radius: 20px; font-size: 0.7rem; font-weight: 600; border: 1px solid rgba(76,175,80,0.2); background: rgba(30,60,30,0.3); color: var(--text-muted); }
-    .milestone.achieved { border-color: var(--orange-primary); background: rgba(255,109,0,0.1); color: var(--orange-light); }
-    .milestone .m-icon { font-size: 0.85rem; }
+    /* ---- your rank ---- */
+    .your-rank { font-size: 0.83rem; color: var(--text); background: rgba(91,196,111,0.07);
+                 border: 1px solid rgba(91,196,111,0.22); border-radius: var(--radius-sm);
+                 padding: 0.6rem 0.75rem; margin-bottom: 0.7rem; }
+    .your-rank .yr-label { font-weight: 700; text-transform: uppercase; font-size: 0.6rem;
+                           letter-spacing: 0.09em; color: var(--text-3); margin-right: 0.45rem; }
 
-    /* Copy button */
-    .copy-row { display: flex; align-items: center; gap: 0.4rem; justify-content: center; margin-top: 0.4rem; }
-    .copy-btn { background: none; border: 1px solid rgba(76,175,80,0.2); color: var(--text-muted); font-size: 0.65rem; padding: 0.2rem 0.5rem; border-radius: 4px; width: auto; margin: 0; text-transform: none; letter-spacing: 0; font-weight: 500; cursor: pointer; }
-    .copy-btn:hover { background: rgba(76,175,80,0.1); color: var(--green-light); box-shadow: none; transform: none; }
-    .copy-btn::after { display: none; }
-
-    /* Share buttons */
-    .share-row { display: flex; gap: 0.5rem; margin-top: 0.75rem; }
-    .share-btn { flex: 1; background: none; border: 1px solid rgba(76,175,80,0.2); color: var(--text-muted); font-size: 0.75rem; padding: 0.5rem; border-radius: 8px; text-transform: none; letter-spacing: 0; font-weight: 600; cursor: pointer; }
-    .share-btn:hover { background: rgba(76,175,80,0.1); color: var(--green-light); box-shadow: none; transform: none; }
-    .share-btn::after { display: none; }
-    .share-btn.x-btn { border-color: rgba(255,255,255,0.15); }
-    .share-btn.x-btn:hover { border-color: #fff; color: #fff; }
-    .share-btn.fc-btn { border-color: rgba(138,99,210,0.3); }
-    .share-btn.fc-btn:hover { border-color: #8B63D2; color: #8B63D2; }
-
-    /* Leaderboard */
-    .leaderboard-table { width: 100%; border-collapse: separate; border-spacing: 0 0.35rem; }
-    .leaderboard-table th { font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; padding: 0.4rem 0.6rem; text-align: left; font-weight: 600; }
-    .leaderboard-table th:last-child { text-align: right; }
-    .leaderboard-row { background: rgba(30,60,30,0.4); border-radius: 8px; }
-    .leaderboard-row td { padding: 0.6rem; font-size: 0.85rem; }
-    .leaderboard-row td:first-child { border-radius: 8px 0 0 8px; width: 35px; text-align: center; }
-    .leaderboard-row td:last-child { border-radius: 0 8px 8px 0; text-align: right; font-family: 'Righteous', cursive; color: var(--green-primary); }
-    .leaderboard-row.is-you { background: rgba(76,175,80,0.15); border: 1px solid rgba(76,175,80,0.2); }
-    .rank-1 { color: #FFD700; font-weight: 700; } .rank-2 { color: #C0C0C0; font-weight: 600; } .rank-3 { color: #CD7F32; font-weight: 600; }
-    .addr-mono { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.8rem; color: #999; }
-    .basename { color: var(--green-light); font-weight: 500; }
-    .leaderboard-empty { text-align: center; padding: 1.5rem; color: var(--text-muted); font-size: 0.85rem; }
-    .lb-loading { text-align: center; padding: 1rem; color: var(--text-muted); font-size: 0.8rem; }
-
-    /* Loading skeletons */
-    .skel { display: inline-block; border-radius: 6px; background: linear-gradient(90deg, rgba(76,175,80,0.08) 25%, rgba(76,175,80,0.20) 50%, rgba(76,175,80,0.08) 75%); background-size: 200% 100%; animation: shimmer 1.4s ease-in-out infinite; }
-    .skel-num { width: 2.4ch; height: 1.5rem; vertical-align: -0.2rem; }
-    .skel-row { display: block; width: 100%; height: 2.3rem; margin: 0.35rem 0; border-radius: 8px; }
+    /* ---- skeletons ---- */
+    .skel { display: inline-block; border-radius: 6px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.10) 50%, rgba(255,255,255,0.04) 75%);
+      background-size: 200% 100%; animation: shimmer 1.4s ease-in-out infinite; }
+    .skel-num { width: 2.2ch; height: 1.25rem; vertical-align: -0.15rem; }
+    .skel-row { display: block; width: 100%; height: 2.4rem; margin-bottom: 0.35rem; border-radius: var(--radius-sm); }
     @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
-    /* Your rank */
-    .your-rank { text-align: center; font-size: 0.85rem; color: var(--green-light); background: rgba(76,175,80,0.1); border: 1px solid rgba(76,175,80,0.2); border-radius: 10px; padding: 0.6rem 0.75rem; margin-bottom: 0.75rem; }
-    .your-rank .yr-label { display: inline-block; font-weight: 700; text-transform: uppercase; font-size: 0.62rem; letter-spacing: 1px; color: var(--text-muted); margin-right: 0.4rem; }
+    /* ---- milestones ---- */
+    .milestones { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+    .milestone { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.32rem 0.6rem;
+                 border-radius: 999px; font-size: 0.7rem; font-weight: 600; border: 1px solid var(--line);
+                 background: var(--surface-2); color: var(--text-3); }
+    .milestone.achieved { border-color: rgba(255,122,26,0.35); background: rgba(255,122,26,0.09); color: #FFB27A; }
+    .milestone .i { width: 12px; height: 12px; }
 
-    /* How it works */
-    .how-it-works { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; margin-top: 0.5rem; }
-    .step { text-align: center; padding: 1rem 0.5rem; background: rgba(30,60,30,0.3); border-radius: 12px; border: 1px solid rgba(76,175,80,0.08); }
-    .step-icon { font-size: 1.8rem; margin-bottom: 0.4rem; }
-    .step-num { font-size: 0.65rem; color: var(--orange-primary); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 0.25rem; }
-    .step-text { font-size: 0.75rem; color: var(--text-muted); line-height: 1.4; }
+    /* ---- steps ---- */
+    .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.6rem; }
+    .step { padding: 0.9rem 0.8rem; background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--radius-sm); }
+    .step .i { width: 17px; height: 17px; color: var(--brand); }
+    .step .n { font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase;
+               color: var(--text-3); font-weight: 700; margin: 0.55rem 0 0.2rem; }
+    .step p { font-size: 0.79rem; color: var(--text-2); line-height: 1.45; }
 
-    .contract-info { display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-top: 0.5rem; padding: 0.5rem 0.75rem; background: rgba(30,60,30,0.3); border-radius: 8px; border: 1px solid rgba(76,175,80,0.08); flex-wrap: wrap; }
-    .contract-info .label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
-    .contract-info .addr { font-family: 'SF Mono', monospace; font-size: 0.75rem; color: #888; }
-    .contract-info a { color: var(--green-primary); text-decoration: none; font-size: 0.7rem; }
-    .contract-info a:hover { text-decoration: underline; }
+    /* ---- contract + footer ---- */
+    .contract { display: flex; align-items: center; justify-content: center; gap: 0.55rem; flex-wrap: wrap;
+                padding: 0.6rem 0.8rem; border: 1px solid var(--line); border-radius: var(--radius-sm);
+                background: var(--surface); font-size: 0.76rem; color: var(--text-3); }
+    .footer { margin-top: 2rem; padding-top: 1.4rem; border-top: 1px solid var(--line); text-align: center; }
+    .footer-links { display: flex; justify-content: center; gap: 1.1rem; flex-wrap: wrap; margin-bottom: 0.7rem; }
+    .footer-links a { color: var(--text-2); font-size: 0.79rem; font-weight: 500; }
+    .footer-links a:hover { color: var(--text); }
+    .footer-meta { font-size: 0.68rem; color: var(--text-3); line-height: 1.7; }
 
-    .footer { width: 100%; margin-top: 2rem; padding: 1.5rem; border-top: 1px solid rgba(76,175,80,0.1); text-align: center; }
-    .footer-links { display: flex; justify-content: center; gap: 1.5rem; margin-bottom: 0.75rem; flex-wrap: wrap; }
-    .footer-links a { color: var(--text-muted); text-decoration: none; font-size: 0.8rem; font-weight: 500; transition: color 0.2s; }
-    .footer-links a:hover { color: var(--green-light); }
-    .footer-meta { font-size: 0.65rem; color: rgba(106,154,106,0.4); line-height: 1.6; }
+    /* ---- overlays ---- */
+    #particles { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 100; }
+    .beat-flash { position: fixed; top: 42%; left: 50%; transform: translate(-50%,-50%);
+      font-size: 3.6rem; font-weight: 800; letter-spacing: -0.03em; color: var(--accent);
+      opacity: 0; pointer-events: none; z-index: 200; font-variant-numeric: tabular-nums; }
+    .beat-flash.show { animation: flash 1s ease-out forwards; }
+    @keyframes flash { 0% { opacity: 0; transform: translate(-50%,-50%) scale(0.7); }
+                       22% { opacity: 1; transform: translate(-50%,-50%) scale(1.1); }
+                       100% { opacity: 0; transform: translate(-50%,-64%) scale(1.25); } }
+    .toast { position: fixed; bottom: 1.25rem; left: 50%; transform: translateX(-50%);
+      padding: 0.6rem 1rem; border-radius: var(--radius-sm); font-size: 0.8rem; color: var(--text);
+      background: #1B241E; border: 1px solid var(--line-strong); z-index: 300;
+      animation: toastIn .25s ease-out, toastOut .25s ease-in 1.75s forwards; }
+    @keyframes toastIn { from { opacity: 0; transform: translate(-50%,10px); } to { opacity: 1; transform: translate(-50%,0); } }
+    @keyframes toastOut { to { opacity: 0; transform: translate(-50%,10px); } }
 
-    .beat-flash { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); font-family: 'Righteous', cursive; font-size: 4.5rem; color: var(--orange-light); opacity: 0; pointer-events: none; z-index: 200; text-shadow: 0 0 40px rgba(255,145,0,0.4); }
-    .beat-flash.show { animation: flashNumber 1s ease-out forwards; }
-    @keyframes flashNumber { 0% { opacity: 0; transform: translate(-50%,-50%) scale(0.5); } 20% { opacity: 1; transform: translate(-50%,-50%) scale(1.2); } 100% { opacity: 0; transform: translate(-50%,-60%) scale(1.5); } }
-
-    /* Toast */
-    .toast { position: fixed; bottom: 1.5rem; right: 1.5rem; padding: 0.6rem 1rem; border-radius: 8px; font-size: 0.8rem; color: #fff; background: var(--green-dark); z-index: 300; animation: toastIn 0.3s ease-out, toastOut 0.3s ease-in 1.7s forwards; box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
-    @keyframes toastIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes toastOut { from { opacity: 1; } to { opacity: 0; transform: translateY(20px); } }
-
-    @media (max-width: 520px) {
-      h1 { font-size: 2rem; } .gorilla { font-size: 4rem; }
-      .how-it-works { grid-template-columns: 1fr; }
-      .navbar { padding: 0.6rem 1rem; } .nav-link { display: none; }
-      .stat-box .value { font-size: 1.5rem; } .stat-box .value.small { font-size: 1rem; }
-      .card { padding: 1.2rem; }
-      .stats-4 { grid-template-columns: 1fr 1fr; }
+    /* ---- responsive ---- */
+    @media (max-width: 560px) {
+      .wrap { padding: 1.25rem 1rem 2.5rem; }
+      h1 { font-size: 1.7rem; }
+      .portrait { width: 72px; height: 72px; }
+      .impact-ring { width: 72px; height: 72px; margin: -36px 0 0 -36px; }
+      .steps { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .nav-link { display: none; }
+      .panel { padding: 1.05rem; }
+      .beat-flash { font-size: 2.8rem; }
     }
-    a { color: var(--green-primary); }
 
-    /* Respect users who ask for less motion — kill decorative animation */
+    /* ---- reduced motion ---- */
     @media (prefers-reduced-motion: reduce) {
-      body::after, .network-dot, .leaf, #beatBtn:not(:disabled) { animation: none !important; }
-      .shake, .gorilla.beating, .impact-ring.active,
-      .stat-box .value.pop, .beat-flash.show, .spinner, .skel { animation: none !important; }
+      .dot, .portrait.beating img, .impact-ring.active, .stat .v.pop,
+      .beat-flash.show, .spinner, .skel, .toast { animation: none !important; }
       .beat-flash.show { opacity: 0 !important; }
       html { scroll-behavior: auto !important; }
     }
   </style>
 </head>
 <body>
+  <!-- Icon sprite: replaces emoji-as-iconography -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+    <symbol id="ic-wallet" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h12a1 1 0 0 1 1 1v2"/><path d="M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-3"/><path d="M21 11h-4a2 2 0 0 0 0 4h4v-4z"/></symbol>
+    <symbol id="ic-burst" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.4"/><path d="M12 2v3.2M12 18.8V22M2 12h3.2M18.8 12H22M4.9 4.9l2.3 2.3M16.8 16.8l2.3 2.3M19.1 4.9l-2.3 2.3M7.2 16.8l-2.3 2.3"/></symbol>
+    <symbol id="ic-tag" viewBox="0 0 24 24"><path d="M20.6 13.4 12 22l-9-9V4a1 1 0 0 1 1-1h9l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.6" cy="7.6" r="1.4"/></symbol>
+    <symbol id="ic-crown" viewBox="0 0 24 24"><path d="M3 8.5 7.2 11 12 4.5 16.8 11 21 8.5 19 19H5L3 8.5z"/></symbol>
+    <symbol id="ic-trophy" viewBox="0 0 24 24"><path d="M7 4h10v5.5a5 5 0 0 1-10 0V4z"/><path d="M7 6H4a3 3 0 0 0 3 3M17 6h3a3 3 0 0 1-3 3"/><path d="M12 14.5V17M9 21h6M10 17h4"/></symbol>
+    <symbol id="ic-vol-on" viewBox="0 0 24 24"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z"/><path d="M15.5 9a4 4 0 0 1 0 6"/><path d="M18 6.5a7.5 7.5 0 0 1 0 11"/></symbol>
+    <symbol id="ic-vol-off" viewBox="0 0 24 24"><path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5H4z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/></symbol>
+    <symbol id="ic-external" viewBox="0 0 24 24"><path d="M14 4h6v6"/><path d="M20 4 10.5 13.5"/><path d="M18 14.5V19a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h4.5"/></symbol>
+    <symbol id="ic-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15.5V5a1 1 0 0 1 1-1h9"/></symbol>
+    <symbol id="ic-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7"/></symbol>
+    <symbol id="ic-flame" viewBox="0 0 24 24"><path d="M12 2.5s5.5 4.5 5.5 9.5a5.5 5.5 0 0 1-11 0c0-2 1-3.5 2-4.5 0 2 1 3 2 3 1.5 0 1.5-3 1.5-8z"/></symbol>
+    <symbol id="ic-x" viewBox="0 0 24 24"><path d="M17.6 3h3.1l-6.8 7.8L22 21h-6.3l-4.9-6.4L5.1 21H2l7.3-8.3L2.3 3h6.4l4.4 5.9L17.6 3zm-1.1 16.1h1.7L7.6 4.8H5.8l10.7 14.3z"/></symbol>
+    <symbol id="ic-fc" viewBox="0 0 24 24"><path d="M4 3h16v3.4h-2.1V21h-3.8v-8.6a4.1 4.1 0 0 0-8.2 0V21H2.1V6.4H4V3z"/></symbol>
+  </defs></svg>
+
   <canvas id="particles"></canvas>
-  <div class="vine-left"></div>
-  <div class="vine-right"></div>
 
   <nav class="navbar">
-    <a href="#" class="nav-brand"><span class="logo">&#x1F98D;</span><span class="brand-text">Gorilla Counter</span></a>
-    <div class="nav-right">
-      <a href="https://basescan.org/address/0x90fc6B668293Bc2d9Ce78eC6E1c2d0d2c00EE668" target="_blank" class="nav-link">Contract</a>
-      <a href="https://github.com/gorillachimps/gorilla-counter" target="_blank" class="nav-link">GitHub</a>
-      <button class="sound-toggle" id="soundToggle" onclick="toggleSound()" title="Toggle sound" aria-label="Toggle sound">&#x1F50A;</button>
-      <div id="fcUserBadge" style="display:none;align-items:center;font-size:0.75rem;font-weight:600;color:var(--green-light);padding:0.3rem 0.6rem;background:rgba(76,175,80,0.1);border:1px solid rgba(76,175,80,0.2);border-radius:20px;gap:4px;"></div>
-      <div class="network-badge"><div class="network-dot"></div>Base Mainnet</div>
+    <div class="nav-inner">
+      <a href="#" class="nav-brand"><img src="icon.png" width="28" height="28" alt=""><b>Gorilla Counter</b></a>
+      <div class="nav-right">
+        <a class="nav-link" href="https://basescan.org/address/0x90fc6B668293Bc2d9Ce78eC6E1c2d0d2c00EE668" target="_blank" rel="noopener">Contract</a>
+        <a class="nav-link" href="https://github.com/gorillachimps/gorilla-counter" target="_blank" rel="noopener">GitHub</a>
+        <button class="icon-btn" id="soundToggle" onclick="toggleSound()" title="Toggle sound" aria-label="Toggle sound"><svg class="i"><use href="#ic-vol-on"></use></svg></button>
+        <div id="fcUserBadge" class="chip" style="display:none"></div>
+        <span class="chip"><span class="dot"></span>Base</span>
+      </div>
     </div>
   </nav>
 
-  <div class="main-content">
-    <div class="gorilla-container">
-      <span class="gorilla" id="gorilla" role="img" aria-label="Gorilla">&#x1F98D;</span>
-      <div class="impact-ring" id="ring1"></div>
-      <div class="impact-ring" id="ring2"></div>
-      <div class="impact-ring" id="ring3"></div>
-    </div>
+  <div class="wrap">
+    <header class="hero">
+      <div class="portrait" id="gorilla">
+        <img src="gorilla-portrait.jpg" width="92" height="92" alt="Silverback gorilla" fetchpriority="high">
+        <div class="impact-ring" id="ring1"></div>
+        <div class="impact-ring" id="ring2"></div>
+        <div class="impact-ring" id="ring3"></div>
+      </div>
+      <div>
+        <h1>Gorilla Counter</h1>
+        <p class="subtitle">The onchain chest-beating competition on Base</p>
+      </div>
+    </header>
 
-    <h1>Gorilla Counter</h1>
-    <p class="subtitle">The onchain chest-beating competition on Base</p>
+    <div class="grid">
+      <div class="stack">
+        <!-- STATS -->
+        <section class="panel">
+          <div class="stats">
+            <div class="stat"><div class="k">Total</div><div class="v" id="totalBeats"><span class="skel skel-num"></span></div></div>
+            <div class="stat"><div class="k">Yours</div><div class="v" id="yourBeats">&mdash;</div></div>
+            <div class="stat"><div class="k">Streak</div><div class="v" id="streakCount">&mdash;</div></div>
+            <div class="stat"><div class="k">Gorillas</div><div class="v" id="gorillaCount"><span class="skel skel-num"></span></div></div>
+          </div>
+          <div class="alpha" id="alphaBanner" style="display:none">
+            <svg class="i"><use href="#ic-crown"></use></svg>
+            <span><span class="lbl">Alpha</span><span id="alphaAddr"></span> &middot; <span id="alphaBeatsCount"></span> beats</span>
+          </div>
+        </section>
 
-    <!-- CONNECT -->
-    <div class="card">
-      <button id="connectBtn" onclick="connectWallet()">&#x1F517; Connect Wallet</button>
-      <div id="walletInfo" style="display:none;">
-        <div class="copy-row">
-          <span id="walletAddr" style="font-size:0.7rem; word-break:break-all; color:var(--text-muted);"></span>
-          <button class="copy-btn" onclick="copyAddr()">Copy</button>
-        </div>
-        <button class="disconnect-btn" onclick="disconnectWallet()">Disconnect</button>
+        <!-- ACTION -->
+        <section class="panel">
+          <div id="connectWrap">
+            <button class="btn btn-block" id="connectBtn" onclick="connectWallet()">
+              <svg class="i"><use href="#ic-wallet"></use></svg> Connect wallet
+            </button>
+            <div id="walletInfo" style="display:none">
+              <div class="wallet-row">
+                <span class="addr-mono" id="walletAddr"></span>
+                <span style="display:flex;gap:0.35rem">
+                  <button class="btn btn-sm btn-ghost" onclick="copyAddr()"><svg class="i"><use href="#ic-copy"></use></svg> Copy</button>
+                  <button class="btn btn-sm btn-ghost" onclick="disconnectWallet()">Disconnect</button>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:0.9rem">
+            <button class="btn btn-primary btn-lg btn-block" id="beatBtn" onclick="beatChest()" disabled>
+              <svg class="i"><use href="#ic-burst"></use></svg> Beat chest
+            </button>
+            <div class="gas-note">Each beat is a Base transaction &mdash; gas under $0.01</div>
+          </div>
+
+          <div style="margin-top:1rem">
+            <input type="text" id="nameInput" placeholder="Your gorilla name" maxlength="32" autocomplete="off" aria-label="Gorilla name">
+            <div class="field-meta"><span id="currentName"></span><span id="byteCounter">0/32 bytes</span></div>
+            <button class="btn btn-block" id="nameBtn" onclick="setName()" disabled>
+              <svg class="i"><use href="#ic-tag"></use></svg> Set name
+            </button>
+          </div>
+
+          <div class="btn-row" style="margin-top:0.9rem">
+            <button class="btn btn-sm" onclick="shareX()"><svg class="i i-solid"><use href="#ic-x"></use></svg> Share</button>
+            <button class="btn btn-sm" onclick="shareFC()"><svg class="i i-solid"><use href="#ic-fc"></use></svg> Cast</button>
+          </div>
+
+          <div id="statusMsg" aria-live="polite" style="margin-top:0.85rem"></div>
+        </section>
+
+        <!-- MILESTONES -->
+        <section class="panel" id="milestonesCard" style="display:none">
+          <div class="sec-h"><svg class="i"><use href="#ic-trophy"></use></svg> Milestones</div>
+          <div class="milestones" id="milestones"></div>
+        </section>
+
+      </div>
+
+      <!-- LEADERBOARD -->
+      <div class="col-right">
+        <section class="panel">
+          <div class="sec-h"><svg class="i"><use href="#ic-trophy"></use></svg> Leaderboard</div>
+          <div id="yourRank" class="your-rank" style="display:none"></div>
+          <div id="leaderboard" class="lb">
+            <span class="skel skel-row"></span><span class="skel skel-row"></span><span class="skel skel-row"></span><span class="skel skel-row"></span>
+          </div>
+        </section>
       </div>
     </div>
 
-    <!-- STATS -->
-    <div class="card">
-      <div class="stats stats-4">
-        <div class="stat-box"><div class="label">Total Beats</div><div class="value" id="totalBeats"><span class="skel skel-num"></span></div></div>
-        <div class="stat-box"><div class="label">Your Beats</div><div class="value" id="yourBeats">-</div></div>
-        <div class="stat-box"><div class="label">Streak</div><div class="value small" id="streakCount">-</div></div>
-        <div class="stat-box"><div class="label">Gorillas</div><div class="value small" id="gorillaCount"><span class="skel skel-num"></span></div></div>
+    <!-- HOW IT WORKS — full width, below the fold on mobile so the
+         leaderboard is reachable without scrolling past an explainer -->
+    <section class="panel" style="margin-top:1rem">
+      <div class="sec-h">How it works</div>
+      <div class="steps">
+        <div class="step"><svg class="i"><use href="#ic-wallet"></use></svg><div class="n">Step 1</div><p>Connect your wallet to Base</p></div>
+        <div class="step"><svg class="i"><use href="#ic-burst"></use></svg><div class="n">Step 2</div><p>Beat your chest onchain</p></div>
+        <div class="step"><svg class="i"><use href="#ic-crown"></use></svg><div class="n">Step 3</div><p>Most beats becomes the Alpha</p></div>
       </div>
-      <div class="alpha-banner" id="alphaBanner" style="display:none;">
-        &#x1F451; <strong>Alpha Gorilla:</strong> <span id="alphaAddr"></span> &middot; <span id="alphaBeatsCount"></span> beats
-      </div>
-    </div>
+    </section>
 
-    <!-- MILESTONES -->
-    <div id="milestonesCard" class="card" style="display:none;">
-      <h2>&#x1F3C5; Milestones</h2>
-      <div class="milestones" id="milestones"></div>
-    </div>
-
-    <!-- BEAT -->
-    <div class="card">
-      <button id="beatBtn" onclick="beatChest()" disabled>&#x1F4A5; Beat Chest!</button>
-      <div class="gas-note">Each beat is a Base tx &mdash; gas &lt; $0.01</div>
-      <div style="margin-top: 0.75rem;">
-        <input type="text" id="nameInput" placeholder="Enter your gorilla name..." maxlength="32">
-        <div id="nameMeta" style="display:flex;justify-content:space-between;align-items:center;font-size:0.7rem;color:var(--text-muted);margin:0.15rem 0.15rem 0.35rem;">
-          <span id="currentName"></span>
-          <span id="byteCounter">0/32 bytes</span>
-        </div>
-        <button class="secondary" id="nameBtn" onclick="setName()" disabled>&#x1F3F7; Set Name</button>
-      </div>
-      <!-- Share -->
-      <div class="share-row">
-        <button class="share-btn x-btn" onclick="shareX()">&#x1D54F; Share on X</button>
-        <button class="share-btn fc-btn" onclick="shareFC()">&#x1F7E3; Cast It</button>
-      </div>
-    </div>
-
-    <div id="statusMsg" aria-live="polite"></div>
-
-    <!-- LEADERBOARD -->
-    <div class="card">
-      <h2>&#x1F3C6; Leaderboard</h2>
-      <div id="yourRank" class="your-rank" style="display:none;"></div>
-      <div id="leaderboard"><div class="skel skel-row"></div><div class="skel skel-row"></div><div class="skel skel-row"></div><div class="skel skel-row"></div></div>
-    </div>
-
-    <!-- HOW IT WORKS -->
-    <div class="card">
-      <h2>How It Works</h2>
-      <div class="how-it-works">
-        <div class="step"><div class="step-icon">&#x1F517;</div><div class="step-num">Step 1</div><div class="step-text">Connect your wallet to Base</div></div>
-        <div class="step"><div class="step-icon">&#x1F4A5;</div><div class="step-num">Step 2</div><div class="step-text">Beat your chest onchain</div></div>
-        <div class="step"><div class="step-icon">&#x1F451;</div><div class="step-num">Step 3</div><div class="step-text">Most beats = Alpha Gorilla</div></div>
-      </div>
-    </div>
-
-    <div class="contract-info">
-      <span class="label">Contract:</span>
-      <span class="addr">0x90fc...E668</span>
-      <button class="copy-btn" onclick="copyContract()">Copy</button>
-      <a href="https://basescan.org/address/0x90fc6B668293Bc2d9Ce78eC6E1c2d0d2c00EE668" target="_blank">View &#x2197;</a>
+    <div class="contract" style="margin-top:1rem">
+      <span>Contract</span>
+      <span class="addr-mono">0x90fc&hellip;E668</span>
+      <button class="btn btn-sm btn-ghost" onclick="copyContract()"><svg class="i"><use href="#ic-copy"></use></svg> Copy</button>
+      <a href="https://basescan.org/address/0x90fc6B668293Bc2d9Ce78eC6E1c2d0d2c00EE668" target="_blank" rel="noopener">Basescan <svg class="i"><use href="#ic-external"></use></svg></a>
     </div>
 
     <footer class="footer">
       <div class="footer-links">
-        <a href="https://basescan.org/address/0x90fc6B668293Bc2d9Ce78eC6E1c2d0d2c00EE668#code" target="_blank" rel="noopener">Contract verified &#x2713;</a>
+        <a href="https://basescan.org/address/0x90fc6B668293Bc2d9Ce78eC6E1c2d0d2c00EE668#code" target="_blank" rel="noopener">Contract verified</a>
         <a href="https://github.com/gorillachimps/gorilla-counter" target="_blank" rel="noopener">Source</a>
         <a href="https://github.com/gorillachimps/gorilla-counter/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>
         <a href="https://base.dev" target="_blank" rel="noopener">Base.dev</a>
       </div>
-      <div class="footer-meta">Builder Code: bc_5jexnr1x &middot; ERC-8021 Attribution &middot; Built on Base<br>No tracking, no cookies &mdash; just chest beats.</div>
+      <div class="footer-meta">Builder code bc_5jexnr1x &middot; ERC-8021 attribution &middot; Built on Base<br>No tracking, no cookies &mdash; just chest beats.</div>
     </footer>
   </div>
 
@@ -354,14 +455,11 @@
           const badge = document.getElementById('fcUserBadge');
           if (badge) {
             badge.textContent = '';
-            if (u.pfpUrl && /^https:\/\//.test(u.pfpUrl)) {
-              const img = document.createElement('img');
-              img.src = u.pfpUrl;
-              img.style.cssText = 'width:22px;height:22px;border-radius:50%;vertical-align:middle;margin-right:4px;';
-              badge.appendChild(img);
-            } else {
-              badge.appendChild(document.createTextNode('🦍 '));
-            }
+            const img = document.createElement('img');
+            img.src = (u.pfpUrl && /^https:\/\//.test(u.pfpUrl)) ? u.pfpUrl : '/icon.png';
+            img.alt = '';
+            img.style.cssText = 'width:18px;height:18px;border-radius:50%;object-fit:cover;';
+            badge.appendChild(img);
             badge.appendChild(document.createTextNode(u.displayName || u.username || 'Gorilla'));
             badge.style.display = 'flex';
           }
@@ -389,17 +487,6 @@
 
   <script>
     const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (!prefersReducedMotion()) {
-      for (let i = 0; i < 6; i++) {
-        const leaf = document.createElement('div');
-        leaf.className = 'leaf';
-        leaf.innerHTML = ['\u{1F343}', '\u{1F344}', '\u{1F331}'][Math.floor(Math.random() * 3)];
-        leaf.style.left = Math.random() * 100 + '%';
-        leaf.style.animationDuration = (14 + Math.random() * 20) + 's';
-        leaf.style.animationDelay = (Math.random() * 15) + 's';
-        document.body.appendChild(leaf);
-      }
-    }
   </script>
 
   <script>
@@ -434,12 +521,12 @@
     };
 
     const MILESTONES = [
-      { beats: 1, icon: '\u{1F95A}', label: 'First Beat' },
-      { beats: 10, icon: '\u{1F34C}', label: '10 Beats' },
-      { beats: 50, icon: '\u{1F4AA}', label: '50 Beats' },
-      { beats: 100, icon: '\u{1F525}', label: '100 Beats' },
-      { beats: 500, icon: '\u{1F48E}', label: '500 Beats' },
-      { beats: 1000, icon: '\u{1F451}', label: '1K Beats' },
+      { beats: 1, label: 'First beat' },
+      { beats: 10, label: '10 beats' },
+      { beats: 50, label: '50 beats' },
+      { beats: 100, label: '100 beats' },
+      { beats: 500, label: '500 beats' },
+      { beats: 1000, label: '1K beats' },
     ];
 
     let userAddress = null;
@@ -481,13 +568,18 @@
         noise.start();
       } catch(e) {}
     }
+    function setSoundIcon() {
+      const btn = document.getElementById('soundToggle');
+      btn.innerHTML = `<svg class="i"><use href="#${soundEnabled ? 'ic-vol-on' : 'ic-vol-off'}"></use></svg>`;
+      btn.setAttribute('aria-pressed', String(soundEnabled));
+    }
     function toggleSound() {
       soundEnabled = !soundEnabled;
       try { localStorage.setItem('gorilla_sound', soundEnabled ? 'on' : 'off'); } catch {}
-      document.getElementById('soundToggle').textContent = soundEnabled ? '\u{1F50A}' : '\u{1F507}';
+      setSoundIcon();
     }
     // Reflect the persisted sound preference on the toggle at load
-    document.getElementById('soundToggle').textContent = soundEnabled ? '\u{1F50A}' : '\u{1F507}';
+    setSoundIcon();
 
     // ==== TOAST ====
     function showToast(msg) {
@@ -508,25 +600,32 @@
 
     // ==== SHARE ====
     function isInFarcaster() { return !!(window.__fcContext && window.__fcContext.user && window.__fcContext.user.fid); }
+    function myBeats() {
+      const t = document.getElementById('yourBeats').textContent.replace(/[,\s]/g, '');
+      return /^\d+$/.test(t) ? Number(t) : 0;
+    }
+    // Connected wallets share a personalised URL — /s/<addr> serves a rank card
+    // embed, so the cast shows "#2 · 9 beats" instead of a generic banner.
+    function shareUrl() { return userAddress ? `${APP_URL}s/${userAddress}` : APP_URL; }
     function shareX() {
-      const beats = document.getElementById('yourBeats').textContent;
+      const beats = myBeats();
       const total = document.getElementById('totalBeats').textContent;
-      const text = beats !== '-'
-        ? `I've beaten my chest ${beats} times on Gorilla Counter! Total community beats: ${total}. Can you beat me? \u{1F98D}\u{1F4A5}\n\n${APP_URL}\n\nBuilt on @base`
-        : `Check out Gorilla Counter - the onchain chest-beating competition on @base! \u{1F98D}\u{1F4A5}\n\n${APP_URL}`;
+      const text = beats
+        ? `I've beaten my chest ${beats.toLocaleString()} times on Gorilla Counter. Community total: ${total}. Can you beat me? \u{1F98D}\n\n${shareUrl()}\n\nBuilt on @base`
+        : `Gorilla Counter — the onchain chest-beating competition on @base \u{1F98D}\n\n${shareUrl()}`;
       const url = `https://x.com/intent/tweet?text=${encodeURIComponent(text)}`;
       if (isInFarcaster() && window.__farcasterSdk?.actions?.openUrl) window.__farcasterSdk.actions.openUrl(url);
       else window.open(url, '_blank');
     }
     async function shareFC() {
-      const beats = document.getElementById('yourBeats').textContent;
-      const text = beats !== '-'
-        ? `I've beaten my chest ${beats} times on Gorilla Counter! \u{1F98D}\u{1F4A5} Can you beat me?`
-        : `Check out Gorilla Counter - the onchain chest-beating competition! \u{1F98D}`;
+      const beats = myBeats();
+      const text = beats
+        ? `I've beaten my chest ${beats.toLocaleString()} times on Gorilla Counter \u{1F98D} Can you beat me?`
+        : `Gorilla Counter — the onchain chest-beating competition \u{1F98D}`;
       if (isInFarcaster() && window.__farcasterSdk?.actions?.composeCast) {
-        try { await window.__farcasterSdk.actions.composeCast({ text, embeds: [APP_URL] }); return; } catch {}
+        try { await window.__farcasterSdk.actions.composeCast({ text, embeds: [shareUrl()] }); return; } catch {}
       }
-      window.open(`https://farcaster.xyz/~/compose?text=${encodeURIComponent(text)}&embeds[]=${encodeURIComponent(APP_URL)}`, '_blank');
+      window.open(`https://farcaster.xyz/~/compose?text=${encodeURIComponent(text)}&embeds[]=${encodeURIComponent(shareUrl())}`, '_blank');
     }
 
     // ==== PARTICLES ====
@@ -538,9 +637,21 @@
     class Particle {
       constructor(x,y,type) { this.x=x;this.y=y;this.type=type;this.vx=(Math.random()-0.5)*12;this.vy=(Math.random()-0.5)*12-4;this.life=1;this.decay=0.015+Math.random()*0.015;this.size=4+Math.random()*8;this.gravity=0.15;this.rotation=Math.random()*Math.PI*2;this.rotSpeed=(Math.random()-0.5)*0.2; }
       update() { this.x+=this.vx;this.vy+=this.gravity;this.y+=this.vy;this.vx*=0.98;this.life-=this.decay;this.rotation+=this.rotSpeed; }
-      draw() { ctx.save();ctx.translate(this.x,this.y);ctx.rotate(this.rotation);ctx.globalAlpha=this.life;if(this.type==='banana'){ctx.font=this.size*2+'px serif';ctx.fillText('\u{1F34C}',-this.size,this.size/2);}else if(this.type==='star'){ctx.fillStyle='#FF9100';ctx.beginPath();for(let i=0;i<5;i++){const a=(i*4*Math.PI)/5-Math.PI/2;ctx[i===0?'moveTo':'lineTo'](Math.cos(a)*this.size,Math.sin(a)*this.size);}ctx.fill();}else{ctx.fillStyle=this.type==='green'?'#4CAF50':'#FF6D00';ctx.fillRect(-this.size/2,-this.size/2,this.size,this.size);}ctx.restore(); }
+      draw() {
+        ctx.save(); ctx.translate(this.x,this.y); ctx.rotate(this.rotation); ctx.globalAlpha=this.life*0.85;
+        ctx.fillStyle = this.type==='accent' ? '#FF7A1A' : '#5BC46F';
+        if (this.type==='dot') { ctx.beginPath(); ctx.arc(0,0,this.size*0.4,0,Math.PI*2); ctx.fill(); }
+        else { const s=this.size*0.75; ctx.fillRect(-s/2,-s/2,s,s); }
+        ctx.restore();
+      }
     }
-    function spawnBeatParticles(){if(prefersReducedMotion())return;const cx=window.innerWidth/2,cy=window.innerHeight*0.18;for(let i=0;i<25;i++)particles.push(new Particle(cx,cy,['banana','star','green','orange'][Math.floor(Math.random()*4)]));}
+    // Geometric only — emoji confetti reads as a toy
+    function spawnBeatParticles(){
+      if(prefersReducedMotion())return;
+      const el=document.getElementById('gorilla'), r=el.getBoundingClientRect();
+      const cx=r.left+r.width/2, cy=r.top+r.height/2;
+      for(let i=0;i<18;i++)particles.push(new Particle(cx,cy,['dot','accent','brand'][Math.floor(Math.random()*3)]));
+    }
     function animateParticles(){ctx.clearRect(0,0,canvas.width,canvas.height);particles=particles.filter(p=>p.life>0);particles.forEach(p=>{p.update();p.draw();});requestAnimationFrame(animateParticles);}
     animateParticles();
 
@@ -548,10 +659,9 @@
     function triggerBeatAnimation() {
       const g=document.getElementById('gorilla');g.classList.remove('beating');void g.offsetWidth;g.classList.add('beating');
       [1,2,3].forEach((n,i)=>{const r=document.getElementById('ring'+n);setTimeout(()=>{r.classList.remove('active');void r.offsetWidth;r.classList.add('active');},i*150);});
-      document.body.classList.remove('shake');void document.body.offsetWidth;document.body.classList.add('shake');
       spawnBeatParticles();
       playBeatSound();
-      document.querySelectorAll('.stat-box .value').forEach(el=>{el.classList.remove('pop');void el.offsetWidth;el.classList.add('pop');});
+      document.querySelectorAll('.stat .v').forEach(el=>{el.classList.remove('pop');void el.offsetWidth;el.classList.add('pop');});
     }
 
     // ==== HELPERS ====
@@ -713,7 +823,7 @@
     function updateStreakUI() {
       const streak = getStreak();
       const el = document.getElementById('streakCount');
-      el.textContent = streak > 0 ? streak + '\u{1F525}' : '-';
+      el.textContent = streak > 0 ? String(streak) : '—';
     }
 
     // ==== NAME UX ====
@@ -723,12 +833,13 @@
     function updateNameUI(name) {
       const cur = document.getElementById('currentName');
       const btn = document.getElementById('nameBtn');
+      const icon = '<svg class="i"><use href="#ic-tag"></use></svg> ';
       if (name) {
         cur.textContent = 'Current: ' + name;
-        if (!btn.classList.contains('is-busy')) btn.innerHTML = '\u{1F3F7} Rename';
+        if (!btn.classList.contains('is-busy')) btn.innerHTML = icon + 'Rename';
       } else {
         cur.textContent = '';
-        if (!btn.classList.contains('is-busy')) btn.innerHTML = '\u{1F3F7} Set Name';
+        if (!btn.classList.contains('is-busy')) btn.innerHTML = icon + 'Set name';
       }
     }
     function updateByteCounter() {
@@ -747,7 +858,8 @@
       card.style.display = 'block';
       container.innerHTML = MILESTONES.map(m => {
         const achieved = beats >= m.beats;
-        return `<div class="milestone ${achieved ? 'achieved' : ''}"><span class="m-icon">${m.icon}</span>${m.label}</div>`;
+        const mark = achieved ? '<svg class="i"><use href="#ic-check"></use></svg>' : '';
+        return `<span class="milestone ${achieved ? 'achieved' : ''}">${mark}${m.label}</span>`;
       }).join('');
     }
 
@@ -827,25 +939,26 @@
 
     function renderLeaderboard() {
       const container = document.getElementById('leaderboard');
-      const entries = Array.from(knownGorillas.values()).sort((a, b) => b.beats - a.beats);
+      const entries = Array.from(knownGorillas.values()).sort((a, b) => b.beats - a.beats || a.addr.localeCompare(b.addr));
 
       if (entries.length === 0) {
-        container.innerHTML = '<div class="leaderboard-empty">No chest beats yet. Be the first!</div>';
+        container.innerHTML = '<div class="lb-empty">No chest beats yet. Be the first.</div>';
         return;
       }
 
-      const rankEmoji = ['\u{1F947}', '\u{1F948}', '\u{1F949}'];
-      let html = '<table class="leaderboard-table"><thead><tr><th>#</th><th>Gorilla</th><th>Beats</th></tr></thead><tbody>';
+      let html = '';
       entries.slice(0, 20).forEach((e, i) => {
-        const rank = i < 3 ? rankEmoji[i] : (i + 1);
-        const rankClass = i < 3 ? `rank-${i + 1}` : '';
+        const rankClass = i < 3 ? ` rank-${i + 1}` : '';
         const display = e.basename ? `<span class="basename">${esc(e.basename)}</span>` :
                          e.name ? esc(e.name) :
-                         `<span class="addr-mono">${e.addr.slice(0, 6)}...${e.addr.slice(-4)}</span>`;
+                         `<span class="addr-mono">${e.addr.slice(0, 6)}…${e.addr.slice(-4)}</span>`;
         const isYou = userAddress && e.addr.toLowerCase() === userAddress.toLowerCase();
-        html += `<tr class="leaderboard-row ${isYou ? 'is-you' : ''}"><td class="${rankClass}">${rank}</td><td>${display}${isYou ? ' (you)' : ''}</td><td>${e.beats.toLocaleString()}</td></tr>`;
+        html += `<div class="lb-row${isYou ? ' is-you' : ''}">` +
+                  `<span class="rank${rankClass}">${i + 1}</span>` +
+                  `<span class="lb-name">${display}${isYou ? '<span class="you-tag">YOU</span>' : ''}</span>` +
+                  `<span class="beats">${e.beats.toLocaleString()}</span>` +
+                `</div>`;
       });
-      html += '</tbody></table>';
       container.innerHTML = html;
       updateYourRank();
     }
@@ -855,13 +968,13 @@
       const el = document.getElementById('yourRank');
       if (!el) return;
       if (!userAddress) { el.style.display = 'none'; return; }
-      const sorted = Array.from(knownGorillas.values()).sort((a, b) => b.beats - a.beats);
+      const sorted = Array.from(knownGorillas.values()).sort((a, b) => b.beats - a.beats || a.addr.localeCompare(b.addr));
       const idx = sorted.findIndex(e => e.addr && e.addr.toLowerCase() === userAddress.toLowerCase());
       if (idx === -1) { el.style.display = 'none'; return; }
       const you = sorted[idx], rank = idx + 1, total = sorted.length;
       let tail;
       if (idx === 0) {
-        tail = "you're the Alpha Gorilla \u{1F451}";
+        tail = "you're the Alpha Gorilla";
       } else {
         const ahead = sorted[idx - 1];
         const gap = ahead.beats - you.beats;
@@ -940,8 +1053,8 @@
       document.getElementById('connectBtn').disabled = false;
       document.getElementById('beatBtn').disabled = true;
       document.getElementById('nameBtn').disabled = true;
-      document.getElementById('yourBeats').textContent = '-';
-      document.getElementById('streakCount').textContent = '-';
+      document.getElementById('yourBeats').textContent = '—';
+      document.getElementById('streakCount').textContent = '—';
       document.getElementById('milestonesCard').style.display = 'none';
       document.getElementById('statusMsg').innerHTML = '';
       document.getElementById('nameInput').value = '';

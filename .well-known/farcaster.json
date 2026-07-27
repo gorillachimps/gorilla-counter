@@ -17,6 +17,7 @@
     "splashImageUrl": "https://gorilla-counter.vercel.app/icon.png",
     "splashBackgroundColor": "#0a0f0a",
     "heroImageUrl": "https://gorilla-counter.vercel.app/og-image.jpg",
+    "screenshotUrls": ["https://gorilla-counter.vercel.app/screenshot-1.png"],
     "ogTitle": "Gorilla Counter",
     "ogDescription": "The onchain chest-beating competition on Base.",
     "ogImageUrl": "https://gorilla-counter.vercel.app/og-image.jpg",

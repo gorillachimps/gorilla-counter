@@ -1,10 +1,22 @@
 {
+  "framework": null,
+  "outputDirectory": ".",
+  "cleanUrls": false,
+  "rewrites": [
+    { "source": "/s/:addr", "destination": "/api/share?u=:addr" }
+  ],
   "headers": [
     {
       "source": "/.well-known/farcaster.json",
       "headers": [
         { "key": "Content-Type", "value": "application/json" },
         { "key": "Access-Control-Allow-Origin", "value": "*" }
+      ]
+    },
+    {
+      "source": "/(gorilla-portrait.jpg|og-image.jpg|icon.png|apple-touch-icon.png|favicon-32.png)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=604800, immutable" }
       ]
     }
   ]
